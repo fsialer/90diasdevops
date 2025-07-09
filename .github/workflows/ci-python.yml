@@ -23,21 +23,21 @@ jobs:
       run: |
         pip install -r requirements.txt
 
-    # - name: Ejecutar tests
-    #   run: |
-    #     PYTHONPATH=. pytest tests/ -v
-
-    # - name: Ejecutar con cobertura
-    #   run: |
-    #     PYTHONPATH=. pytest --cov=app --cov-report=term --cov-report=html
-
     - name: Ejecutar tests
       run: |
-         pytest tests/ -v
+        PYTHONPATH=. pytest tests/ -v
 
     - name: Ejecutar con cobertura
       run: |
-         pytest --cov=app --cov-report=term --cov-report=html
+        PYTHONPATH=. pytest --cov=app --cov-report=term --cov-report=html
+
+    # - name: Ejecutar tests
+    #   run: |
+    #      pytest tests/ -v
+
+    # - name: Ejecutar con cobertura
+    #   run: |
+    #      pytest --cov=app --cov-report=term --cov-report=html
 
     - name: Guardar reporte
       uses: actions/upload-artifact@v4
