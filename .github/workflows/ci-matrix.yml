@@ -1,0 +1,25 @@
+name: CI Python Matrix
+
+on:
+  push:
+    branches: [semana0302]
+  pull_request:
+    branches: [semana0302]
+
+jobs:
+  test-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - run: |
+        pip install -r requirements.txt
+        pytest tests/ -v
