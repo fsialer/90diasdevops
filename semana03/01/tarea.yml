@@ -1,0 +1,49 @@
+name: tarea
+on: [dispatch]
+
+env:
+  RAMA_ACTUAL: ${{github.ref_name}}
+  NUMERO: 5
+jobs:
+  validar_rama_main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: validar rama main
+        if: ${{ env.RAMA_ACTUAL == 'main' }}
+        run: |
+          echo '✅ estoy en la rama main'
+          if [ $(( NUMERO % 2 )) -eq 0 ]; then
+            echo "✅ El numero $NUMERO es par"
+          else
+            echo "✖️El numero $NUMERO no es par"
+          fi
+
+      - name: validar rama develop
+        if: ${{ env.RAMA_ACTUAL == 'develop' }}
+        run: |
+          echo '✅ estoy en la rama develop'
+          if [ $(( NUMERO % 2 )) -en 0 ]; then
+            echo "✅ El numero $NUMERO es impar"
+          else
+            echo "✖️El numero $NUMERO no es impar"
+          fi
+    
+      - name: validar rama Test
+        if: ${{ env.RAMA_ACTUAL == 'test' }}
+        run: |
+          echo '✅ estoy en la rama test'    
+          
+          if [ NUMERO -le 1 ]; then
+            echo "✖️ $NUMERO no es un número primo"
+            exit 0
+          fi
+
+          # Verificar divisores desde 2 hasta la raíz cuadrada del número
+          for ((i=2; i*i<=NUMERO; i++)); do
+            if (( NUMERO % i == 0 )); then
+              echo "✖️ $NUMERO no es un número primo"
+              exit 0
+            fi
+          done
+          echo "$NUMERO es un número primo"
+

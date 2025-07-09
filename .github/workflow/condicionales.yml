@@ -1,0 +1,14 @@
+names: Rama detectada
+on:
+  push:
+    branches: [main, develop, feature/*]
+  workflow_dispatch:
+
+jobs:
+  detectar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Detectar Rama
+        run:  |
+        echo "Rama actual: ${{github.ref_name}}"
+

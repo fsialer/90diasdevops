@@ -1,0 +1,19 @@
+name: Variables DevOps
+
+on: [push, workflow_dispatch]
+
+env:
+  PROYECTO: "Mi App DevOps"
+  AMBIENTE: "Desarrollo"
+
+jobs:
+  mostrar:
+    runs-on: ubuntu-latest
+    env:
+      RESPONSABLE: "Estudiante DevOps"
+    steps:
+    - name: Mostrar info
+      run: |
+        echo "Proyecto: $PROYECTO"
+        echo "Ambiente: $AMBIENTE"
+        echo "Responsable: $RESPONSABLE"
