@@ -1,0 +1,39 @@
+name: CI Básico Python
+
+on:
+  push:
+    branches: [semana0302, semana0302/develop]
+  pull_request:
+    branches: [semana0302]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Configurar Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Instalar dependencias
+      run: |
+        pip install -r requirements.txt
+
+    - name: Ejecutar tests
+      run: |
+        pytest tests/ -v
+
+    - name: Ejecutar con cobertura
+      run: |
+        pytest --cov=app --cov-report=term --cov-report=html
+
+    - name: Guardar reporte
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: htmlcov/
+
