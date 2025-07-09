@@ -1,0 +1,63 @@
+# docker-compose.yml - WordPress Moderno con Docker Compose V2+
+services:
+  wordpress:
+    image: wordpress:php8.2-apache
+    container_name: wp-web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wpuser
+      WORDPRESS_DB_PASSWORD: wppass123
+      WORDPRESS_DB_NAME: wpdb
+    volumes:
+      - wp_data:/var/www/html
+      - ./wp-content:/var/www/html/wp-content  # Para desarrollo personalizado
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wp_network
+
+  db:
+    image: mariadb:11.3
+    container_name: wp-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass123
+      MYSQL_DATABASE: wpdb
+      MYSQL_USER: wpuser
+      MYSQL_PASSWORD: wppass123
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - wp_network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: wp-admin
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: wpuser
+      PMA_PASSWORD: wppass123
+    depends_on:
+      - db
+    networks:
+      - wp_network
+
+volumes:
+  wp_data:
+  db_data:
+
+networks:
+  wp_network:
+    driver: bridge
