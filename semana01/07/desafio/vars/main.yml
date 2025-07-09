@@ -1,0 +1,5 @@
+repositorio_git: "https://github.com/roxsross/roxs-devops-project90.git"
+path_repositorio: "/home/vagrant/roxs-devops-project90"
+path_vote: "{{path_repositorio}}/roxs-voting-app/vote"
+path_worker:  "{{path_repositorio}}/roxs-voting-app/worker"
+path_result: "{{path_repositorio}}/roxs-voting-app/result"

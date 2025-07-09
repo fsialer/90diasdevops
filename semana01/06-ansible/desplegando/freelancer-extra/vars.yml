@@ -1,0 +1,5 @@
+repo_url: "https://github.com/startbootstrap/startbootstrap-freelancer/archive/gh-pages.zip"
+web_root: "/var/www/freelancer"
+
+sitio_titulo: "Mi Portfolio"
+sitio_nombre: "Fernando Dev"

@@ -1,0 +1,19 @@
+- name: instalar dependencias
+  apt:
+    name: ["nginx"]
+    state: present
+    update_cache: yes
+  
+- name: crear directorio web
+  file:
+    path: "{{ web_root }}"
+    state: directory
+    mode: '0755'
+
+- name: copiar archivo de landing page
+  copy:
+    src: ../files/index.html
+    dest: "{{ web_root }}/index.html"
+    owner: www-data
+    group: www-data
+    mode: '0664'

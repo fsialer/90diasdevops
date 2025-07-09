@@ -1,0 +1,77 @@
+- name: Eliminar paquetes conflictivos de Node.js anteriores
+  apt:
+    name:
+      - libnode-dev
+      - nodejs
+      - libnode72 
+    state: absent
+    purge: yes
+  ignore_errors: yes
+
+- name: Agregar repositorio oficial de Node.js 18
+  shell: |
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+  args:
+    executable: /bin/bash
+
+- name: Instalar Node.js y npm
+  apt:
+    name: ["nodejs"]
+    state: present
+    update_cache: yes
+
+- name: Verificar versión de Node.js
+  command: node -v
+  register: node_version
+- debug:
+    msg: "Node.js version: {{ node_version.stdout }}"
+
+- name: Verificar versión de npm
+  command: npm -v
+  register: npm_version
+- debug:
+    msg: "npm version: {{ npm_version.stdout }}"
+
+- name: Copiar proyecto React completo al servidor
+  copy:
+    src: "{{ react_project_local }}/"
+    dest: "{{ react_project_remote }}/"
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Verificar existencia de package.json
+  stat:
+    path: "{{ react_project_remote }}/package.json"
+  register: package_json_check
+
+- name: Falla si no existe package.json
+  fail:
+    msg: "No se encontró package.json en el servidor remoto"
+  when: not package_json_check.stat.exists
+
+- name: Instalar dependencias del proyecto React
+  command: npm install
+  args:
+    chdir: "{{ react_project_remote }}"
+
+- name: Ejecutar build del proyecto React
+  command: npm run build
+  args:
+    chdir: "{{ react_project_remote }}"
+
+- name: Crear directorio /var/www/html
+  file:
+    path: "{{ web_root }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Copiar archivos del build al directorio web
+  copy:
+    src: "{{ react_project_remote }}/dist/"
+    dest: "{{ web_root }}/"
+    owner: www-data
+    group: www-data
+    mode: '0755'

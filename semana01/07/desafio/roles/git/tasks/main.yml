@@ -1,0 +1,14 @@
+- name: "Instalar git"
+  ansible.builtin.package:
+    name: git
+    state: present
+
+- name: "Eliminar repositorio existente"
+  ansible.builtin.file: 
+    path: "{{path_repositorio}}"
+    state: absent
+
+- name: "Clonar repositorio"
+  ansible.builtin.git:
+    repo: "{{repositorio_git}}"
+    dest: "{{path_repositorio}}"

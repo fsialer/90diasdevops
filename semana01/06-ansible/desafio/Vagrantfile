@@ -1,0 +1,14 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+  
+    config.vm.define "landing" do |landing|
+        landing.vm.hostname = "landing"
+        landing.vm.network "private_network", ip: "192.168.33.10"
+        landing.vm.provision "shell", inline: <<-SHELL
+          sudo apt update
+          sudo apt install -y ansible
+          ansible-galaxy collection install community.crypto
+          ansible-playbook  /vagrant/playbook.yml
+        SHELL
+    end
+end

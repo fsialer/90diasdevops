@@ -1,0 +1,37 @@
+---
+- name: configuracion basica de servidor
+  #hosts: nginx
+  hosts: localhost
+  become: yes
+
+  tasks:
+    - name: Instalar paquetes esenciales
+      apt:
+        name: [git, nginx]
+        state: present
+        update_cache: yes
+    - name: Crear usuario deploy
+      user:
+        name: deploy
+        groups: sudo
+        append: yes
+        password: "{{ 'mipassword'| password_hash('sha512')}}"
+    # - name: agregando html personalizado
+    #   copy:
+    #     dest: /var/www/html/index.html
+    #     content: "<h1>Hola desde Ansible</h1>"
+    #     owner: www-data
+    #     group: www-data
+    #     mode: '0644'
+    - name: Copiar HTML
+      copy:
+        src: files/index.html
+        dest: /var/www/html/
+
+    - name: Habilitar firewall para puertos 22, 80 y 443
+      ufw:
+        rule: allow
+        port: "22,80,443"
+        proto: tcp
+    
+        

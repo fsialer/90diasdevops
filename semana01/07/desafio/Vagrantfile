@@ -1,0 +1,15 @@
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/jammy64"
+
+    config.vm.define "voteapp" do |voteapp|
+        voteapp.vm.hostname = "voteapp"
+        voteapp.vm.network "private_network", ip: "192.168.20.20"
+        # voteapp.vm.provision "shell", inline: <<-SHELL
+        #   sudo apt update
+        #   sudo apt install -y ansible
+        #   ansible-playbook  /vagrant/playbook.yml
+        # SHELL
+        voteapp.vm.provision "iniciar_ansible", type: "shell", path:"./scripts/iniciar_ansible.sh", privileged: true
+        voteapp.vm.provision "iniciar", type:"shell", path: "./scripts/iniciar_app.sh", privileged: true
+    end
+end

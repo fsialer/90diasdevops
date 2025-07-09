@@ -1,0 +1,36 @@
+- name: Instalar PostgreSQL
+  ansible.builtin.package:
+    name: postgresql
+    state: present
+
+- name: Crear usuario sin privilegios por ahora
+  become_user: postgres
+  ansible.builtin.postgresql_user:
+    name: postgres
+    password: postgres
+
+- name: Crear base de datos y asignar propietario
+  become_user: postgres
+  ansible.builtin.postgresql_db:
+    name: votes
+    owner: postgres
+
+- name: Otorgar privilegios sobre la base de datos
+  become_user: postgres
+  ansible.builtin.postgresql_user:
+    name: postgres
+    db: votes
+    priv: "ALL"
+
+- name: Obtener IP del host remoto
+  ansible.builtin.command: hostname -I
+  register: ip_host
+
+- name: Mostrar IP
+  debug:
+    msg: "IP del host PostgreSQL: {{ ip_host.stdout }}"
+# - name: Crear base de datos en PostgreSQL
+#   become_user: postgres
+#   ansible.builtin.postgresql_db:
+#     name: votes
+#     owner: postgres

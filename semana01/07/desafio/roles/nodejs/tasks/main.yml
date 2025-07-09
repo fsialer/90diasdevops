@@ -1,0 +1,43 @@
+- name: Eliminar paquetes conflictivos de Node.js anteriores
+  apt:
+    name:
+      - libnode-dev
+      - nodejs
+      - libnode72 
+    state: absent
+    purge: yes
+  ignore_errors: yes
+
+- name: Agregar repositorio oficial de Node.js 20
+  shell: |
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+  args:
+    executable: /bin/bash
+
+- name: Instalar Node.js y npm
+  apt:
+    name: ["nodejs"]
+    state: present
+    update_cache: yes
+
+- name: Verificar versión de Node.js
+  command: node -v
+  register: node_version
+- debug:
+    msg: "Node.js version: {{ node_version.stdout }}"
+
+- name: Verificar versión de npm
+  command: npm -v
+  register: npm_version
+- debug:
+    msg: "npm version: {{ npm_version.stdout }}"
+
+- name: Instalar dependencias del result
+  command: npm install
+  args:
+    chdir: "{{ path_result }}"
+
+- name: Instalar dependencias de worker
+  command: npm install
+  args:
+    chdir: "{{ path_worker }}"
