@@ -44,4 +44,10 @@ jobs:
       with:
         name: coverage-report
         path: htmlcov/
+        
+    - name: Verificar app corriendo
+      run: |
+        timeout 10 python app.py &
+        sleep 5
+        curl -f http://localhost:5000/health
 
