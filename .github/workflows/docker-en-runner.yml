@@ -16,7 +16,7 @@ jobs:
 
     - name: Test Docker
       run: |
-        docker run -d --name app-runner -p 5000:5000 mi-app:runner
+        docker run -d --name app-runner -p 5000:5000 90diasdevops:runner
         sleep 10
         curl -f http://localhost:5000/health
         docker stop app-runner && docker rm app-runner
