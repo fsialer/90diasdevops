@@ -26,8 +26,12 @@ jobs:
 
     - name: verificar contenedores
       run: |
-        sleep 20    
-        docker ps
+       for i in {1..10}; do
+        docker ps -a
+        echo "Intento $i..."
+        curl -f http://localhost/health && break
+        sleep 3
+       done
 
     - name: Verificar app
       run: curl -f http://localhost/health
