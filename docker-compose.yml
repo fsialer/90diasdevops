@@ -8,10 +8,13 @@ services:
       - DB_HOST=postgresql://postgres:password123@postgres:5432/miapp
       - REDIS_HOST=redis://redis:6379/0
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
     volumes:
       - ./app:/app
+     
 
   postgres:
     image: postgres:15-alpine
@@ -21,6 +24,11 @@ services:
       - POSTGRES_PASSWORD=password123
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   redis:
     image: redis:7-alpine
