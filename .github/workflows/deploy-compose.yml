@@ -1,0 +1,29 @@
+name: Deploy con Docker Compose
+
+on:
+  push:
+    branches: [semana0305, semana0305develop]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: [ubuntu-latest]
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+
+    - name: Parar servicios anteriores
+      run: docker compose down -v || true
+
+    - name: Construir servicios
+      run: docker compose -f docker-compose.yml build
+
+    - name: Levantar servicios
+      run: docker compose -f docker-compose.yml up -d
+
+    - name: Verificar app
+      run: curl -f http://localhost/health
+    
+    - name: Ejecutar script registro y listado
+      run: ./scripts/setup_customer.sh
