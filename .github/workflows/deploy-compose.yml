@@ -38,4 +38,6 @@ jobs:
       run: curl -f http://localhost/health
     
     - name: Ejecutar script registro y listado
-      run: ./scripts/setup_customer.sh
+      run: |
+        chmod +x ./scripts/setup_customer.sh
+        ./scripts/setup_customer.sh
