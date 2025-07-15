@@ -24,6 +24,9 @@ jobs:
     - name: Levantar servicios
       run: docker compose -f docker-compose.yml up -d
 
+    - name: verificar contenedores
+      run: docker ps
+      
     - name: Verificar app
       run: curl -f http://localhost/health
     
