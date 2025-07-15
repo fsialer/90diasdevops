@@ -13,6 +13,8 @@ jobs:
     - name: Checkout código
       uses: actions/checkout@v4
 
+    - name: listar
+      run: ls -l
     - name: Parar servicios anteriores
       run: docker compose down -v || true
 
