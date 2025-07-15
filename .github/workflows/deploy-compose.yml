@@ -28,6 +28,7 @@ jobs:
       run: |
        for i in {1..10}; do
         docker ps -a
+        docker logs 90diasdevops-app-1
         echo "Intento $i..."
         curl -f http://localhost/health && break
         sleep 3
