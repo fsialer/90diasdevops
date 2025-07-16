@@ -8,6 +8,15 @@ app.use((req, res, next) => {
     next();
 });
 
+app.get('/png', (req, res) => {
+    logger.info('home')
+    res.json({
+        status: "OK",
+        timestamp: new Date(),
+        message: "hola"
+    })
+})
+
 app.get('/ping', (req, res) => {
     logger.info('pong')
     res.json({
