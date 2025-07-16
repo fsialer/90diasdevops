@@ -9,23 +9,29 @@ jobs:
   check-app:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout código
-      uses: actions/checkout@v4
-    
-    - name: Parar servicios anteriores
-      run: docker compose down -v || true
+      - name: Checkout código
+        uses: actions/checkout@v4
 
-    - name: Construir servicios
-      run: docker compose -f ./app/docker-compose.yml build
+      - name: Parar servicios anteriores
+        run: docker compose down -v || true
 
-    - name: Levantar servicios
-      run: docker compose -f ./app/docker-compose.yml up -d
+      - name: Construir servicios
+        run: docker compose -f ./app/docker-compose.yml build
 
-    - name: Chequear estado
-      run: |
-        curl -f http://localhost:3000/health && echo "✅ App OK" || echo "❌ App caída"
-    
-    - name: ejecutar script de test
-      run: |
-        chmod +x ./scripts/check-app.sh
-        ./scripts/check-app.sh
+      - name: Levantar servicios
+        run: docker compose -f ./app/docker-compose.yml up -d
+
+      - name: Chequear estado
+        run: |
+          curl -f http://localhost:3000/health && echo "✅ App OK" || echo "❌ App caída"
+
+      - name: Ejecutar script de test
+        run: bash ./scripts/check-app.sh
+
+      - name: Mostrar logs si falla
+        if: failure()
+        run: docker compose -f ./app/docker-compose.yml logs
+
+      - name: Parar y limpiar contenedores
+        if: always()
+        run: docker compose -f ./app/docker-compose.yml down -v
