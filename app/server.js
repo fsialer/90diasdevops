@@ -8,7 +8,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get('/png', (req, res) => {
+app.get('/', (req, res) => {
     logger.info('home')
     res.json({
         status: "OK",
