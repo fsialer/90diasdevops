@@ -25,6 +25,9 @@ jobs:
 
       - name: Chequear estado
         run: |
+          sleep 20
+          docker ps
+          sleep 10
           curl -f http://localhost:3000/health && echo "✅ App OK" || echo "❌ App caída"
 
       - name: Ejecutar script de test
