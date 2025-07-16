@@ -3,6 +3,8 @@ name: Monitoreo Simple
 on:
   schedule:
     - cron: '0 */2 * * *'  # Cada 2 horas
+  push:
+    branches: [semana0306, semana0306develop]
   workflow_dispatch:
 
 jobs:
