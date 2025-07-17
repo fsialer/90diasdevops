@@ -1,2 +1,8 @@
 **/.vagrant/
 **/__pycache__
+**/modulos/
+**/node_modules/
+.env
+.crt
+dist/
+build/
