@@ -2,7 +2,7 @@ name: ci
 
 on:
     push: 
-        branches: [semana0307/develop]
+        branches: [semana0307_develop]
     workflow_dispatch:
 
 jobs:
