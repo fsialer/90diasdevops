@@ -24,8 +24,8 @@ jobs:
             
             - name: Ejecutar test
               run: |
-                pytest ./test/test_app.py
-                pytest ./test/lint_test.py
+                pytest ./roxs-voting-app/vote/test/test_app.py
+                pytest ./roxs-voting-app/vote/test/lint_test.py
     
     test-result:
         runs-on: ["self-hosted"]
@@ -45,7 +45,7 @@ jobs:
             
             - name: Ejecutar test
               run: |
-                npm test ./tests/main.test.js
+                npm test ./roxs-voting-app/result/tests/main.test.js
     
     test-worker:
         runs-on: ["self-hosted"]
@@ -62,7 +62,7 @@ jobs:
               run: |
                 cd ./roxs-voting-app/worker
                 npm install
-                npm test ./tests/main.test.js
+                npm test ./roxs-voting-app/worker/tests/main.test.js
     
     integration-test:
         runs-on: ["self-hosted"]
