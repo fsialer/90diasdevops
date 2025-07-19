@@ -1,24 +1,27 @@
 name: Monitoreo simple
 
 on:
-   schedule:
+  schedule:
     - cron: '10 * * * *'
-   workflow_dispatch:
+  workflow_dispatch:
+
 jobs:
-    check-app:
-        runs-on: ["self-hosted"]
+  check-app:
+    runs-on: ["self-hosted"]
+    name: "Health Check apps"
+    steps:
+      - uses: actions/checkout@v4
 
-        steps:
-            - name: Chequear estado de los servicios
-              id: health-check
-              run: |
-                chmod +x ../scripts/health-check.sh
-                ../scripts/health-check.sh staging
+      - name: Chequear estado de los servicios
+        id: health-check
+        run: |
+          chmod +x scripts/health-check.sh
+          scripts/health-check.sh staging
 
-            - name: Discord notification
-              if: steps.health-check.outcome == 'failure'
-              uses: cl8dep/action-discord@v0
-              with:
-                webhook: ${{ secrets.DISCORD_WEBHOOK }}
-                username: supervisor
-                message: '❌ El chequeo de salud ha fallado en staging.'
+      - name: Discord notification
+        if: failure()
+        uses: cl8dep/action-discord@v0
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          username: supervisor
+          message: '❌ El chequeo de salud ha fallado en staging.'

@@ -29,4 +29,4 @@ jobs:
                 ./deploy.sh staging       
             - name: Ver logs
               run: |
-                docker compose -f ./docker-compose.staging.yml logs -f        
+                docker compose -f ./docker-compose.staging.yml logs        
