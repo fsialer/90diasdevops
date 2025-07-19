@@ -52,6 +52,10 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      worker:
+        condition: service_healthy
+      result:
+        condition: service_healthy
     networks:
       - vote-prod-net
     
