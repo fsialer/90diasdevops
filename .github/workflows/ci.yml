@@ -1,0 +1,97 @@
+name: ci
+
+on:
+    push: 
+        branches: [semana0307_develop]
+    workflow_dispatch:
+
+jobs:
+    test-vote:
+        name: Testing Vote Service ...
+        runs-on: ["self-hosted"]
+        steps:
+            - name: Checkout código
+              uses: actions/checkout@v4
+
+            - name: Instalar python
+              uses: actions/setup-python@v5
+              with:
+                python-version: "3.11"
+            
+            - name: Instalar dependencias
+              run: |
+                cd ./roxs-voting-app/vote
+                pip install -r requirements.txt
+            
+            - name: Ejecutar test
+              run: |
+                cd ./roxs-voting-app/vote
+                python ./tests/test_app.py
+    
+    test-result:
+        runs-on: ["self-hosted"]
+        name: Testing Result Service ...
+        steps:
+            - name: Checkout código
+              uses: actions/checkout@v4
+
+            - name: Instalar npm y node
+              uses: actions/setup-node@v4
+              with:
+                node-version: '18'
+
+            - name: Instalar dependencias
+              run: |
+                cd ./roxs-voting-app/result
+                npm install
+            
+            - name: Ejecutar test
+              run: |
+                cd ./roxs-voting-app/result
+                npm test ./tests/main.test.js
+    
+    test-worker:
+        runs-on: ["self-hosted"]
+        name: Testing Worker Service ...
+        steps:
+            - name: Checkout código
+              uses: actions/checkout@v4
+
+            - name: Instalar npm y node
+              uses: actions/setup-node@v4
+              with:
+                node-version: '18'
+
+            - name: Instalar dependencias
+              run: |
+                cd ./roxs-voting-app/worker
+                npm install
+            - name: Ejecutar test
+              run: |
+                cd ./roxs-voting-app/worker
+                npm test ./tests/main.test.js
+    
+    integration-test:
+        runs-on: ["self-hosted"]
+        name: Testing Integrated Services ...
+        needs: [ test-vote,test-result,test-worker]
+        if: 
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            
+            - name: Setup docker
+              uses: docker/setup-docker-action@v4
+              with:
+                daemon-config: |
+                    {
+                    "debug": true,
+                    "features": {
+                        "containerd-snapshotter": true
+                      }
+                    }
+            - name: Starting testing integrated services
+              run: |
+                cd ./scripts
+                chmod +x ./deploy.sh
+                ./deploy.sh              
