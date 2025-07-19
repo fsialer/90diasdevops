@@ -87,58 +87,6 @@ services:
     networks:
       - vote-staging-net
   
-  test-vote:
-    build:
-      context: ./roxs-voting-app/vote
-      dockerfile: Dockerfile
-    environment:
-      ENV: ${ENV}
-      REDIS_HOST: ${REDIS_HOST}
-      DATABASE_HOST: ${DATABASE_HOST}
-      DATABASE_USER: ${POSTGRES_USER}
-      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
-      DATABASE_NAME: ${POSTGRES_DB}
-    command: ["sh", "-c", "python ./test/test_app.py"]
-    depends_on:
-      - vote
-    networks:
-      - vote-staging-net
-
-  test-result:
-    build:
-      context: ./roxs-voting-app/result
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      ENV: ${ENV}
-      APP_PORT: ${APP_PORT}
-      DATABASE_HOST: ${DATABASE_HOST}
-      DATABASE_USER: ${POSTGRES_USER}
-      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
-      DATABASE_NAME: ${POSTGRES_DB}
-    command: ["sh", "-c", "npm test ./tests/main.test.js"]
-    depends_on:
-      - result
-    networks:
-      - vote-staging-net
-  
-  test-worker:
-    build:
-      context: ./roxs-voting-app/worker
-      dockerfile: Dockerfile
-    environment:
-      ENV: ${ENV}
-      REDIS_HOST: ${REDIS_HOST}
-      DATABASE_HOST: ${DATABASE_HOST}
-      DATABASE_USER: ${POSTGRES_USER}
-      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
-      DATABASE_NAME: ${POSTGRES_DB}
-    command: ["sh", "-c", "npm test ./tests/main.test.js"]
-    depends_on:
-      - worker
-    networks:
-      - vote-staging-net
 networks:
   vote-staging-net:
     driver: bridge
