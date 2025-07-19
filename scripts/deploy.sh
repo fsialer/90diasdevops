@@ -17,7 +17,7 @@ else
     echo "🏗️ Build de imágenes Docker"
     docker compose -f ../docker-compose.yml build
     docker compose -f ../docker-compose.yml up -d
-    docker compose -f ../docker-compose.yml logs -f
+    docker compose -f ../docker-compose.yml logs
     docker compose -f ../docker-compose.yml down -v
 fi
 
