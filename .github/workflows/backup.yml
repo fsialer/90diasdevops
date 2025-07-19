@@ -1,0 +1,18 @@
+name: Backup DB
+
+on:
+  schedule:
+    - cron: '10 * * * *'  # Todos los días a las 03:00 AM UTC
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ["self-hosted"]
+    steps:
+      - name: Clonar repo
+        uses: actions/checkout@v4
+
+      - name: Starting backup database
+        run: |
+          chmod +x scripts/backup-db.sh
+          ./scripts/backup-db.sh

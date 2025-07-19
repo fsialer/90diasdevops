@@ -7,7 +7,7 @@ on:
 
 jobs:
     deploy-production:
-        runs-on: ["self-hosted"]
+        runs-on: ["ubuntu-latest"]
         name: Starting deploy production ....
         steps:
             - name: Checkout code
