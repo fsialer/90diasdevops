@@ -13,16 +13,6 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
             
-            - name: Setup docker
-              uses: docker/setup-docker-action@v4
-              with:
-                daemon-config: |
-                    {
-                    "debug": true,
-                    "features": {
-                        "containerd-snapshotter": true
-                      }
-                    }
             - name: Deploy environment staging
               run: |
                 cd ./scripts
