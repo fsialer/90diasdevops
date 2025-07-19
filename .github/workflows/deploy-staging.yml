@@ -28,6 +28,7 @@ jobs:
                 cd ./scripts
                 chmod +x ./deploy.sh
                 ./deploy.sh staging       
+
             - name: Ver logs de staging
               run: |
-                docker compose -f ./docker-compose.staging.yml logs        
+                docker compose -f ./docker-compose.staging.yml logs -f 
