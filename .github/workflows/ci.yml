@@ -75,7 +75,6 @@ jobs:
         runs-on: [ubuntu-latest"]
         name: Testing Integrated Services ...
         needs: [ test-vote,test-result,test-worker]
-        if: 
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
