@@ -7,6 +7,7 @@ on:
 
 jobs:
     test-vote:
+        name: Test Vote Service
         runs-on: ["self-hosted"]
         steps:
             - name: Checkout código
@@ -29,6 +30,7 @@ jobs:
     
     test-result:
         runs-on: ["self-hosted"]
+        name: Test Result Service
         steps:
             - name: Checkout código
               uses: actions/checkout@v4
@@ -50,6 +52,7 @@ jobs:
     
     test-worker:
         runs-on: ["self-hosted"]
+        name: Test Worker Service
         steps:
             - name: Checkout código
               uses: actions/checkout@v4
@@ -70,7 +73,9 @@ jobs:
     
     integration-test:
         runs-on: ["self-hosted"]
+        name: Test Integrated Services
         needs: [ test-vote,test-result,test-worker]
+        if: 
         steps:
             - name: Checkout código
               uses: actions/checkout@v4
@@ -85,8 +90,8 @@ jobs:
                         "containerd-snapshotter": true
                       }
                     }
-            - name: Desplegar ambiente
+            - name: Test de integracion
               run: |
                 cd ./scripts
                 chmod +x ./deploy.sh
-                ./deploy.sh               
+                ./deploy.sh              

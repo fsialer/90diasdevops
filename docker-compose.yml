@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:15-alpine
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -32,8 +32,6 @@ services:
     build:
       context: ./roxs-voting-app/vote
       dockerfile: Dockerfile
-    ports:
-      - "80:80"
     environment:
       ENV: ${ENV}
       REDIS_HOST: ${REDIS_HOST}
@@ -41,24 +39,41 @@ services:
       DATABASE_USER: ${POSTGRES_USER}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
       DATABASE_NAME: ${POSTGRES_DB}
+    ports:
+      - "80:80"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://vote/healthz"]
-      interval: 1m30s
-      timeout: 30s
-      retries: 5
-      start_period: 30s
+       test: ["CMD", "curl", "-f", "http://vote/healthz"]
+       interval: 1m30s
+       timeout: 30s
+       retries: 5
+       start_period: 30s
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      worker:
-        condition: service_started
-      result:
-        condition: service_started
+       postgres:
+         condition: service_healthy
+       redis:
+         condition: service_healthy
+       worker:
+         condition: service_started
+       result:
+         condition: service_started
     networks:
       - vote-net
-    
+
+  test-vote:
+    build:
+      context: ./roxs-voting-app/vote
+      dockerfile: Dockerfile
+    command: ["pytest", "./tests/integration"]
+    environment:
+      ENV: ${ENV}
+      REDIS_HOST: ${REDIS_HOST}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_USER: ${POSTGRES_USER}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_NAME: ${POSTGRES_DB}
+    networks:
+      - vote-net
+
   result:
     build:
       context: ./roxs-voting-app/result
@@ -73,14 +88,28 @@ services:
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
       DATABASE_NAME: ${POSTGRES_DB}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://result:3000/healthz"]
-      interval: 1m30s
-      timeout: 30s
-      retries: 5
-      start_period: 30s
+       test: ["CMD", "curl", "-f", "http://result:3000/healthz"]
+       interval: 1m30s
+       timeout: 30s
+       retries: 5
+       start_period: 30s
     depends_on:
-      postgres:
-        condition: service_healthy
+       postgres:
+         condition: service_healthy
+    networks:
+      - vote-net
+
+  test-result:
+    build:
+      context: ./roxs-voting-app/result
+      dockerfile: Dockerfile
+    environment:
+      ENV: ${ENV}
+      APP_PORT: ${APP_PORT}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_USER: ${POSTGRES_USER}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_NAME: ${POSTGRES_DB}
     networks:
       - vote-net
   
@@ -96,55 +125,18 @@ services:
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
       DATABASE_NAME: ${POSTGRES_DB}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://worker:3000/healthz"]
-      interval: 1m30s
-      timeout: 30s
-      retries: 5
-      start_period: 30s
+       test: ["CMD", "curl", "-f", "http://worker:3000/healthz"]
+       interval: 1m30s
+       timeout: 30s
+       retries: 5
+       start_period: 30s
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+       postgres:
+         condition: service_healthy
+       redis:
+         condition: service_healthy
     networks:
       - vote-net
-  
-  test-vote:
-    build:
-      context: ./roxs-voting-app/vote
-      dockerfile: Dockerfile
-    environment:
-      ENV: ${ENV}
-      REDIS_HOST: ${REDIS_HOST}
-      DATABASE_HOST: ${DATABASE_HOST}
-      DATABASE_USER: ${POSTGRES_USER}
-      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
-      DATABASE_NAME: ${POSTGRES_DB}
-    command: ["sh", "-c", "python ./test/test_app.py"]
-    depends_on:
-      - vote
-    networks:
-      - vote-net
-
-  test-result:
-    build:
-      context: ./roxs-voting-app/result
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      ENV: ${ENV}
-      APP_PORT: ${APP_PORT}
-      DATABASE_HOST: ${DATABASE_HOST}
-      DATABASE_USER: ${POSTGRES_USER}
-      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
-      DATABASE_NAME: ${POSTGRES_DB}
-    command: ["sh", "-c", "npm test ./tests/main.test.js"]
-    depends_on:
-      - result
-    networks:
-      - vote-net
-  
   test-worker:
     build:
       context: ./roxs-voting-app/worker
@@ -156,9 +148,6 @@ services:
       DATABASE_USER: ${POSTGRES_USER}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
       DATABASE_NAME: ${POSTGRES_DB}
-    command: ["sh", "-c", "npm test ./tests/main.test.js"]
-    depends_on:
-      - worker
     networks:
       - vote-net
 networks:
