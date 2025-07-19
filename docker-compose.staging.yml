@@ -1,0 +1,148 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      postgres_staging_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - vote-staging-net
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      redis_staging_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    networks:
+      - vote-staging-net
+
+  vote:
+    build:
+      context: ./roxs-voting-app/vote
+      dockerfile: Dockerfile
+    ports:
+      "80:80"
+    environment:
+      ENV: ${ENV}
+      REDIS_HOST: ${REDIS_HOST}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_USER: ${POSTGRES_USER}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_NAME: ${POSTGRES_DB}
+    command: ["sh", "-c", "pytest ./test/test_app.py && ./test/lint_test.py"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - vote-staging-net
+    
+  result:
+    build:
+      context: ./roxs-voting-app/result
+      dockerfile: Dockerfile
+    ports:
+      "3000:3000"
+    environment:
+      ENV: ${ENV}
+      APP_PORT: ${APP_PORT}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_USER: ${POSTGRES_USER}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_NAME: ${POSTGRES_DB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vote-staging-net
+  
+  worker:
+    build:
+      context: ./roxs-voting-app/worker
+      dockerfile: Dockerfile
+    environment:
+      ENV: ${ENV}
+      REDIS_HOST: ${REDIS_HOST}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_USER: ${POSTGRES_USER}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_NAME: ${POSTGRES_DB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - vote-staging-net
+  
+  test-vote:
+    build:
+      context: ./roxs-voting-app/vote
+      dockerfile: Dockerfile
+    environment:
+      ENV: ${ENV}
+      REDIS_HOST: ${REDIS_HOST}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_USER: ${POSTGRES_USER}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_NAME: ${POSTGRES_DB}
+    command: ["sh", "-c", "pytest ./test/test_app.py && ./test/lint_test.py"]
+    depends_on:
+      - vote
+    networks:
+      - vote-staging-net
+
+  test-result:
+    build:
+      context: ./roxs-voting-app/result
+      dockerfile: Dockerfile
+    ports:
+      "3000:3000"
+    environment:
+      ENV: ${ENV}
+      APP_PORT: ${APP_PORT}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_USER: ${POSTGRES_USER}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_NAME: ${POSTGRES_DB}
+    command: ["sh", "-c", "npm test ./tests/main.test.js"]
+    depends_on:
+      - result
+    networks:
+      - vote-staging-net
+  
+  test-worker:
+    build:
+      context: ./roxs-voting-app/worker
+      dockerfile: Dockerfile
+    environment:
+      ENV: ${ENV}
+      REDIS_HOST: ${REDIS_HOST}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_USER: ${POSTGRES_USER}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_NAME: ${POSTGRES_DB}
+    command: ["sh", "-c", "npm test ./tests/main.test.js"]
+    depends_on:
+      - worker
+    networks:
+      - vote-staging-net
+networks:
+  vote-staging-net:
+    driver: bridge
+volumes:
+  redis_staging_data:
+  postgres_staging_data:

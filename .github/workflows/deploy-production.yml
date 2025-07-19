@@ -1,0 +1,28 @@
+name: deploy-production
+
+on:
+    pull_request:  
+        branches: [semana0307]
+    workflow_dispatch:
+
+jobs:
+    integration-test:
+        runs-on: ["self-hosted"]
+        steps:
+            - name: Checkout código
+              uses: actions/checkout@v4
+            
+            - name: Instalar docker
+              uses: docker/setup-docker-action@v4
+              with:
+                daemon-config: |
+                    {
+                    "debug": true,
+                    "features": {
+                        "containerd-snapshotter": true
+                      }
+                    }
+            - name: Desplegar ambiente
+              run: |
+                chmod +x ./scripts/deploy.sh
+                ./scripts/deploy.sh production

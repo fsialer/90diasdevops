@@ -1,0 +1,86 @@
+name: ci
+
+on:
+    push: 
+        branches: [semana0307/develop]
+    workflow_dispatch:
+
+jobs:
+    test-vote:
+        runs-on: ["self-hosted"]
+        steps:
+            - name: Checkout código
+              uses: actions/checkout@v4
+
+            - name: Instalar python
+              uses: actions/setup-python@v5
+              with:
+                python-version: "3.11"
+            
+            - name: Instalar dependencias
+              run: |
+                cd ./roxs-voting-app/vote/
+                pip install -r requirements.txt
+            
+            - name: Ejecutar test
+              run: |
+                pytest ./test/test_app.py
+                pytest ./test/lint_test.py
+    
+    test-result:
+        runs-on: ["self-hosted"]
+        steps:
+            - name: Checkout código
+              uses: actions/checkout@v4
+
+            - name: Instalar npm y node
+              uses: actions/setup-node@v4
+              with:
+                node-version: '18'
+
+            - name: Instalar dependencias
+              run: |
+                cd ./roxs-voting-app/result
+                npm install
+            
+            - name: Ejecutar test
+              run: |
+                npm test ./tests/main.test.js
+    
+    test-worker:
+        runs-on: ["self-hosted"]
+        steps:
+            - name: Checkout código
+              uses: actions/checkout@v4
+
+            - name: Instalar npm y node
+              uses: actions/setup-node@v4
+              with:
+                node-version: '18'
+
+            - name: Instalar dependencias
+              run: |
+                cd ./roxs-voting-app/worker
+                npm install
+                npm test ./tests/main.test.js
+    
+    integration-test:
+        runs-on: ["self-hosted"]
+        steps:
+            - name: Checkout código
+              uses: actions/checkout@v4
+            
+            - name: Instalar docker
+              uses: docker/setup-docker-action@v4
+              with:
+                daemon-config: |
+                    {
+                    "debug": true,
+                    "features": {
+                        "containerd-snapshotter": true
+                      }
+                    }
+            - name: Desplegar ambiente
+              run: |
+                chmod +x ./scripts/deploy.sh
+                ./scripts/deploy.sh               
