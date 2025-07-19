@@ -1,4 +1,4 @@
-name: deploy-production
+name: Deploy Production
 
 on:
     pull_request:  
@@ -6,13 +6,14 @@ on:
     workflow_dispatch:
 
 jobs:
-    integration-test:
+    deploy-production:
         runs-on: ["self-hosted"]
+        name: Starting deploy production ....
         steps:
-            - name: Checkout código
+            - name: Checkout code
               uses: actions/checkout@v4
             
-            - name: Instalar docker
+            - name: Setup docker
               uses: docker/setup-docker-action@v4
               with:
                 daemon-config: |
@@ -22,7 +23,7 @@ jobs:
                         "containerd-snapshotter": true
                       }
                     }
-            - name: Desplegar ambiente produccion
+            - name: Deploy environment production
               run: |
                 cd ./scripts
                 chmod +x ./deploy.sh

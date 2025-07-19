@@ -1,4 +1,4 @@
-name: deploy-staging
+name: Deploy Staging
 
 on:
     push: 
@@ -6,13 +6,14 @@ on:
     workflow_dispatch:
 
 jobs:
-    integration-test:
+    deploy-staging:
         runs-on: ["self-hosted"]
+        name: Starting deploy staging ....
         steps:
-            - name: Checkout código
+            - name: Checkout code
               uses: actions/checkout@v4
             
-            - name: Instalar docker
+            - name: Setup docker
               uses: docker/setup-docker-action@v4
               with:
                 daemon-config: |
@@ -22,11 +23,11 @@ jobs:
                         "containerd-snapshotter": true
                       }
                     }
-            - name: Desplegar ambiente
+            - name: Deploy environment staging
               run: |
                 cd ./scripts
                 chmod +x ./deploy.sh
                 ./deploy.sh staging       
-            - name: Ver logs
+            - name: Ver logs de staging
               run: |
                 docker compose -f ./docker-compose.staging.yml logs        

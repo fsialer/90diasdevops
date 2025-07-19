@@ -7,7 +7,7 @@ on:
 
 jobs:
     test-vote:
-        name: Test Vote Service
+        name: Testing Vote Service ...
         runs-on: ["self-hosted"]
         steps:
             - name: Checkout código
@@ -30,7 +30,7 @@ jobs:
     
     test-result:
         runs-on: ["self-hosted"]
-        name: Test Result Service
+        name: Testing Result Service ...
         steps:
             - name: Checkout código
               uses: actions/checkout@v4
@@ -52,7 +52,7 @@ jobs:
     
     test-worker:
         runs-on: ["self-hosted"]
-        name: Test Worker Service
+        name: Testing Worker Service ...
         steps:
             - name: Checkout código
               uses: actions/checkout@v4
@@ -73,14 +73,14 @@ jobs:
     
     integration-test:
         runs-on: ["self-hosted"]
-        name: Test Integrated Services
+        name: Testing Integrated Services ...
         needs: [ test-vote,test-result,test-worker]
         if: 
         steps:
-            - name: Checkout código
+            - name: Checkout code
               uses: actions/checkout@v4
             
-            - name: Instalar docker
+            - name: Setup docker
               uses: docker/setup-docker-action@v4
               with:
                 daemon-config: |
@@ -90,7 +90,7 @@ jobs:
                         "containerd-snapshotter": true
                       }
                     }
-            - name: Test de integracion
+            - name: Starting testing integrated services
               run: |
                 cd ./scripts
                 chmod +x ./deploy.sh
