@@ -9,10 +9,10 @@ check_result() {
     curl -fs http://localhost:3000/healthz && echo "✅ App result OK" || echo "❌ App result caído"
 }
 
-if [[$ENV == "staging"]]; then
+if [[ $ENV == "staging" ]]; then
     check_vote
     check_result
-elif [[$ENV == "production"]]; then
+elif [[ $ENV == "production" ]]; then
     check_vote
     check_resul
 else
