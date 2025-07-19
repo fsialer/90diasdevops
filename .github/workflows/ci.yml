@@ -72,7 +72,7 @@ jobs:
                 npm test ./tests/main.test.js
     
     integration-test:
-        runs-on: [ubuntu-latest"]
+        runs-on: [ubuntu-latest]
         name: Testing Integrated Services ...
         needs: [test-vote, test-result, test-worker]
         steps:
