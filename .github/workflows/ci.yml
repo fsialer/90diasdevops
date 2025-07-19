@@ -19,7 +19,7 @@ jobs:
             
             - name: Instalar dependencias
               run: |
-                cd ../roxs-voting-app/vote
+                cd ./roxs-voting-app/vote
                 pip install -r requirements.txt
             
             - name: Ejecutar test
@@ -40,7 +40,7 @@ jobs:
 
             - name: Instalar dependencias
               run: |
-                cd ../roxs-voting-app/result
+                cd ./roxs-voting-app/result
                 npm install
             
             - name: Ejecutar test
@@ -60,7 +60,7 @@ jobs:
 
             - name: Instalar dependencias
               run: |
-                cd ../roxs-voting-app/worker
+                cd ./roxs-voting-app/worker
                 npm install
                 npm test ./tests/main.test.js
     
