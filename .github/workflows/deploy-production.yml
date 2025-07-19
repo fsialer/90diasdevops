@@ -22,7 +22,8 @@ jobs:
                         "containerd-snapshotter": true
                       }
                     }
-            - name: Desplegar ambiente
+            - name: Desplegar ambiente produccion
               run: |
-                chmod +x ./scripts/deploy.sh
-                ./scripts/deploy.sh production
+                cd ./scripts
+                chmod +x ./deploy.sh
+                ./deploy.sh production
