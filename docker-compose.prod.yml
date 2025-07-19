@@ -53,9 +53,9 @@ services:
       redis:
         condition: service_healthy
       worker:
-        condition: service_active
+        condition: service_started
       result:
-        condition: service_active
+        condition: service_started
     networks:
       - vote-prod-net
     
