@@ -53,9 +53,9 @@ services:
       redis:
         condition: service_healthy
       worker:
-        condition: service_healthy
+        condition: service_active
       result:
-        condition: service_healthy
+        condition: service_active
     networks:
       - vote-staging-net
     
