@@ -24,6 +24,6 @@ jobs:
                     }
             - name: Desplegar ambiente
               run: |
-                chmod +x ./scripts/deploy.sh
-                ./scripts/deploy.sh staging       
+                chmod +x ../scripts/deploy.sh
+                ../scripts/deploy.sh staging       
                 docker compose -f ../docker-compose.staging.yml logs -f        
