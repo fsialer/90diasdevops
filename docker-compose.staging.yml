@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      postgres_staging_data:/var/lib/postgresql/data
+      - postgres_staging_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 5s
@@ -18,7 +18,7 @@ services:
   redis:
     image: redis:7-alpine
     volumes:
-      redis_staging_data:/data
+      - redis_staging_data:/data
     healthcheck:
       test: ["CMD", "redis-cli","ping"]
       interval: 1m30s

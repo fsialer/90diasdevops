@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      postgres_prod_data:/var/lib/postgresql/data
+      - postgres_prod_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 5s
@@ -18,7 +18,7 @@ services:
   redis:
     image: redis:7-alpine
     volumes:
-      redis_prod_data:/data
+      - redis_prod_data:/data
     healthcheck:
       test: ["CMD", "redis-cli","ping"]
       interval: 1m30s
@@ -109,7 +109,7 @@ services:
       context: ./roxs-voting-app/result
       dockerfile: Dockerfile
     ports:
-      "3000:3000"
+      - "3000:3000"
     environment:
       ENV: ${ENV}
       APP_PORT: ${APP_PORT}
