@@ -1,3 +1,7 @@
 **/__pycache__
 **/.vagrant
 app/
+**/.terraform*
+**/tfplan
+.env
+**/*.tfstate*
