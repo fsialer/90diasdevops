@@ -259,7 +259,7 @@ jobs:
     - name: Mostrar plan en comentario
       uses: actions/github-script@v6
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ secrets.TOKEN_PERSONAL }}
         script: |
           const fs = require('fs');
           
