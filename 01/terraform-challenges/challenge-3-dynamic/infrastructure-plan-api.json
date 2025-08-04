@@ -1,0 +1,16 @@
+{
+    "components": {
+        "auto_scaling": "Auto Scaling Group",
+        "compute": "EC2 Instances",
+        "load_balancer": "Application Load Balancer",
+        "networking": "VPC + Subnets"
+    },
+    "configuration": {
+        "auto_scaling": true,
+        "instances": 2,
+        "load_balancer": true,
+        "type": "t3.small"
+    },
+    "estimated_cost": 34,
+    "workload_type": "api"
+}

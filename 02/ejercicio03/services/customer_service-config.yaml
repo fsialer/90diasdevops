@@ -1,0 +1,19 @@
+service_name: customer_service
+internal_url: http://customer_service:8082
+
+resources:
+  cpu: 500m
+  memory: 1024Mi
+
+health_check:
+  path: /actuator/health
+  port: 8082
+
+env:
+  ENVIRONMENT: prod
+  SERVICE_NAME: customer_service
+  SERVICE_PORT: 8082
+  USER_SERVICE_URL: http://user_service:8081
+
+tags:
+  Environment: prod

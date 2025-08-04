@@ -1,0 +1,19 @@
+service_name: employee_service
+internal_url: http://employee_service:8083
+
+resources:
+  cpu: 500m
+  memory: 1024Mi
+
+health_check:
+  path: /actuator/health
+  port: 8083
+
+env:
+  ENVIRONMENT: prod
+  SERVICE_NAME: employee_service
+  SERVICE_PORT: 8083
+  USER_SERVICE_URL: http://user_service:8081
+
+tags:
+  Environment: prod

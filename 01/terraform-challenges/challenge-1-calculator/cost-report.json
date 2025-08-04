@@ -1,0 +1,21 @@
+{
+    "costs": {
+        "instance1": 0.4992,
+        "instance2": 0.9984
+    },
+    "currency": "USD",
+    "generated_at": "2025-07-22T20:02:47Z",
+    "instances": {
+        "instance1": {
+            "count": 2,
+            "hours": 24,
+            "type": "t3.micro"
+        },
+        "instance2": {
+            "count": 2,
+            "hours": 24,
+            "type": "t3.small"
+        }
+    },
+    "total_cost": 1.4976
+}

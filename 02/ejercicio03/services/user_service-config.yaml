@@ -1,0 +1,18 @@
+service_name: user_service
+internal_url: http://user_service:8081
+
+resources:
+  cpu: 500m
+  memory: 1024Mi
+
+health_check:
+  path: /actuator/health
+  port: 8081
+
+env:
+  ENVIRONMENT: prod
+  SERVICE_NAME: user_service
+  SERVICE_PORT: 8081
+
+tags:
+  Environment: prod

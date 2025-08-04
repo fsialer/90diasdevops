@@ -1,0 +1,38 @@
+stages:
+  - validate
+  - plan
+  - deploy
+
+variables:
+  TF_ROOT: ${CI_PROJECT_DIR}
+  TF_VERSION: "1.6.0"
+
+before_script:
+  - wget -O terraform.zip "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
+  - unzip terraform.zip && rm terraform.zip
+  - mv terraform /usr/local/bin/
+  - cd $TF_ROOT
+
+validate:
+  stage: validate
+  script:
+    - terraform init -backend=false
+    - terraform validate
+    - terraform fmt -check
+
+plan:
+  stage: plan
+  script:
+    - terraform init
+    - terraform plan -out=tfplan
+  artifacts:
+    paths:
+      - $TF_ROOT/tfplan
+
+deploy:
+  stage: deploy
+  script:
+    - terraform init
+    - terraform apply tfplan
+  only:
+    - main

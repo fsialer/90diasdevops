@@ -1,0 +1,16 @@
+{
+    "cdn_enabled": false,
+    "environment": "staging",
+    "features": {
+        "monitoring": true,
+        "ssl": false,
+        "storage_size": 50
+    },
+    "instance_type": "t3.small",
+    "monthly_cost": 17,
+    "scaling": {
+        "max": 2,
+        "min": 1
+    },
+    "waf_enabled": false
+}

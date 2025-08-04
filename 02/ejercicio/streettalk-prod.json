@@ -1,0 +1,16 @@
+{
+    "cdn_enabled": true,
+    "environment": "prod",
+    "features": {
+        "monitoring": true,
+        "ssl": true,
+        "storage_size": 100
+    },
+    "instance_type": "t3.medium",
+    "monthly_cost": 68,
+    "scaling": {
+        "max": 6,
+        "min": 2
+    },
+    "waf_enabled": true
+}

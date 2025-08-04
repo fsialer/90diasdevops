@@ -1,0 +1,14 @@
+==================================
+REPORTE DE ENTORNO: staging
+REGION: us-east-3
+==================================
+**** DETALLE DE RECURSOS *****
+------------------------------
+| Recurso   |     Precio     |
+------------------------------
+| ec2-instance | 70|
+| s3-bucket | 35|
+| rds-database | 140|
+------------------------------
+
+Precio total: 245

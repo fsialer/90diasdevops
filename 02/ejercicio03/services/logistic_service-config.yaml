@@ -1,0 +1,19 @@
+service_name: logistic_service
+internal_url: http://logistic_service:8084
+
+resources:
+  cpu: 200m
+  memory: 1024Mi
+
+health_check:
+  path: /healthz
+  port: 8084
+
+env:
+  EMPLOYEE_SERVICE_URL: http://employee_service:8083
+  ENVIRONMENT: prod
+  SERVICE_NAME: logistic_service
+  SERVICE_PORT: 8084
+
+tags:
+  Environment: prod
