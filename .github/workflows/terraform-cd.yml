@@ -325,7 +325,7 @@ jobs:
     - name: Notificar equipo
       if: always()
       run: |
-        echo "📢 Notificando al equipo sobre el despliegue..."
+        echo "📢 Notificando al equipo sobre el despliegue...."
         echo "🎯 Ambiente: Producción"
         echo "📊 Acción: ${{ github.event.inputs.action }}"
         echo "🔍 Estado del workflow: ${{ job.status }}"
