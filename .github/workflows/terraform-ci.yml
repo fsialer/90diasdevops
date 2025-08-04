@@ -252,7 +252,7 @@ jobs:
         AWS_ENDPOINT_URL: http://localhost:4566
         
     - name: Descargar plan de dev
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: tfplan-dev
         
