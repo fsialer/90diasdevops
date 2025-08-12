@@ -25,20 +25,20 @@ resource "docker_volume" "postgres_data" {
 }
 
 resource "docker_container" "service" {
-  count = var.replica_count
-  name = var.service_name
+  name = "${var.app_name}"
   image = docker_image.postgres.image_id
   # Puerto solo en el primer contenedor
-  dynamic "ports" {
-    for_each = count.index == 0 ? [1] : []
-    content {
-      internal = 5432
-      external = var.external_port
-    }
+  ports {
+    internal = 5432
+    external = var.external_port
   }
 
   # Variables de entorno
-  env =  [for k, v in var.environment_vars : "${k}=${v}"]
+  env = concat(
+    [
+      for k, v in var.environment_vars : "${k}=${v}"
+    ]
+  )
   
   # Límites de recursos
   memory =  var.memory_limit

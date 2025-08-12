@@ -14,5 +14,5 @@ curl -f http://localhost:3000 && echo "✅ Result app OK"
 
 # Verificar logs
 echo "Logs recientes:"
-docker logs roxs-voting-vote-1 --tail 5
-docker logs roxs-voting-result-1 --tail 5
+docker logs voteapp-1 --tail 5
+docker logs resultapp-1 --tail 5

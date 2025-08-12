@@ -1,6 +1,6 @@
 # Desarrollo - Recursos mínimos
 database_password = "dev_password_123"
-replica_count     = 1
+replica_count     = 2
 memory_limit      = 256
 external_ports = {
   vote   = 8080

@@ -15,7 +15,7 @@ resource "docker_image" "worker_app" {
 
 resource "docker_container" "service" {
   count =  var.replica_count
-  name = var.service_name
+  name = "${var.app_name}-${count.index+1}"
   image = docker_image.worker_app.image_id
   # Puerto solo en el primer contenedor
   dynamic "ports" {
@@ -27,7 +27,15 @@ resource "docker_container" "service" {
   }
 
   # Variables de entorno
-  env =  [for k, v in var.environment_vars : "${k}=${v}"]
+  env = concat(
+    [
+      for k, v in var.environment_vars : "${k}=${v}"
+    ],
+    [
+      "REPLICA_ID=${count.index + 1}",
+      "TOTAL_REPLICAS=${var.replica_count}"
+    ]
+  )
   
   # Límites de recursos
   memory = var.memory_limit
