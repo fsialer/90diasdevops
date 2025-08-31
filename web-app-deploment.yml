@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+  labels:
+    app: web-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      volumes:
+        - name: shared-logs
+          emptyDir: {}
+
+      containers:
+        # Contenedor principal: Apache HTTP Server
+        - name: web-container
+          image: httpd:2.4.65
+          ports:
+            - containerPort: 80
+          env:
+            - name: ENVIRONMENT
+              value: "development"
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "100m"
+            limits:
+              memory: "64Mi"
+              cpu: "200m"
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /usr/local/apache2/htdocs/logs
+
+          livenessProbe:
+            httpGet:
+              path: /logs/log.txt
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /logs/log.txt
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+        # Sidecar: Generador de logs
+        - name: log-generator
+          image: busybox
+          command: ["/bin/sh", "-c"]
+          args:
+            - while true; do
+                echo "Log generado en $(date)" >> /logs/log.txt;
+                sleep 5;
+              done;
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /logs
