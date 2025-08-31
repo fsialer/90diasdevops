@@ -1,0 +1,152 @@
+# Backend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-backend-merchandise
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: api
+        tier: backend
+    spec:
+      containers:
+      - name: api
+        image: merchandise:v1
+        ports:
+        - containerPort: 3003
+---
+# Backend Service (interno)
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service-merchandise
+spec:
+  selector:
+    app: api
+    tier: backend
+  type: ClusterIP
+  ports:
+  - port: 3003
+---
+# Backend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-backend-shopping-cart
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: api
+        tier: backend
+    spec:
+      containers:
+      - name: api
+        image: shopping-cart:v1
+        ports:
+        - containerPort: 3002
+---
+# Backend Service (interno)
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service-shopping-cart
+spec:
+  selector:
+    app: api
+    tier: backend
+  type: ClusterIP
+  ports:
+  - port: 3002
+---
+
+# Backend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: api
+        tier: backend
+    spec:
+      containers:
+      - name: api
+        image: products:v1
+        ports:
+        - containerPort: 3001
+---
+# Backend Service (interno)
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+spec:
+  selector:
+    app: api
+    tier: backend
+  type: ClusterIP
+  ports:
+  - port: 3001
+---
+# Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: web
+        tier: frontend
+    spec:
+      containers:
+      - name: web
+        image: frontend:v1
+        env:
+        - name: PRODUCTS_SERVICE
+          value: "api-service"
+        - name: SHOPPING_CART_SERVICE
+          value: "api-service-shopping-cart"
+        - name: MERCHANDISE_SERVICE
+          value: "api-service-merchandise"
+        ports:
+        - containerPort: 3000
+---
+# Frontend Service (externo)
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+spec:
+  selector:
+    app: web
+    tier: frontend
+  ports:
+  - port: 3000
+    nodePort: 30100
+  type: NodePort
