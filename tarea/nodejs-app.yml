@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nodejs-config
+data:
+  NODE_ENV: "production"
+  PORT: "3000"
+  LOG_LEVEL: "info"
+  package.json: |
+    {
+      "name": "mi-app",
+      "version": "1.0.0",
+      "scripts": {
+        "start": "node server.js"
+      }
+    }
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nodejs-secrets
+type: Opaque
+stringData:
+  MONGODB_URI: "mongodb://user:password@mongo:27017/myapp"
+  JWT_SECRET: "mi-super-secreto-jwt-key"
+  API_KEY: "abcd-1234-efgh-5678"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nodejs-app
+  template:
+    metadata:
+      labels:
+        app: nodejs-app
+    spec:
+      containers:
+      - name: nodejs
+        image: node:16-alpine
+        ports:
+        - containerPort: 3000
+        
+        envFrom:
+        - configMapRef:
+            name: nodejs-config
+        - secretRef:
+            name: nodejs-secrets
+        
+        volumeMounts:
+        - name: app-config
+          mountPath: /app/config
+        
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      
+      volumes:
+      - name: app-config
+        configMap:
+          name: nodejs-config

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secure-secret
+  annotations:
+    description: "Database credentials for production"
+type: Opaque
+data:
+  username: <base64-encoded>
+  password: <base64-encoded>
+stringData:  # Más fácil de escribir (se codifica automáticamente)
+  config.yaml: |
+    database:
+      host: db.example.com
+      port: 5432
+      ssl: true

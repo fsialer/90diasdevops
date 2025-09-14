@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app-files
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-app-files
+  template:
+    metadata:
+      labels:
+        app: web-app-files
+    spec:
+      containers:
+      - name: app
+        image: nginx:latest
+        volumeMounts:
+        # Montar ConfigMap como archivos
+        - name: config-volume
+          mountPath: /etc/config
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d
+        
+        # Montar Secret como archivos
+        - name: secret-volume
+          mountPath: /etc/secrets
+          readOnly: true
+      
+      volumes:
+      # Volumen desde ConfigMap
+      - name: config-volume
+        configMap:
+          name: app-config
+      - name: nginx-config
+        configMap:
+          name: app-config
+          items:
+          - key: nginx.conf
+            path: default.conf
+      
+      # Volumen desde Secret
+      - name: secret-volume
+        secret:
+          secretName: app-secrets
+          defaultMode: 0400  # Solo lectura para el propietario

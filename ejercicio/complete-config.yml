@@ -1,0 +1,120 @@
+# ConfigMap para configuración de la app
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: webapp-config
+data:
+  environment: "development"
+  log_level: "debug"
+  cache_enabled: "true"
+  app_port: "3000"
+  
+  # Configuración de nginx
+  nginx.conf: |
+    server {
+        listen 80;
+        server_name localhost;
+        
+        location / {
+            proxy_pass http://localhost:3000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+        
+        location /health {
+            access_log off;
+            return 200 "healthy\n";
+        }
+    }
+
+---
+# Secret para credenciales
+apiVersion: v1
+kind: Secret
+metadata:
+  name: webapp-secrets
+type: Opaque
+data:
+  db_password: bXlzZWNyZXRwYXNzd29yZA==  # mysecretpassword
+  api_key: YWJjZGVmZ2hpams=              # abcdefghijk
+  jwt_secret: bXktand0LXNlY3JldC1rZXk=   # my-jwt-secret-key
+
+---
+# Deployment que usa ambos
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: webapp2
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+        
+        # Variables de entorno desde ConfigMap
+        env:
+        - name: ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: webapp-config
+              key: environment
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: webapp-config
+              key: log_level
+        
+        # Variables desde Secret
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: webapp-secrets
+              key: db_password
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: webapp-secrets
+              key: api_key
+        
+        # Montar configuración de nginx
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /usr/local/apache2/conf/extra/
+        - name: secrets-volume
+          mountPath: /etc/app-secrets
+          readOnly: true
+      
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: webapp-config
+          items:
+          - key: nginx.conf
+            path: httpd-vhosts.conf
+      - name: secrets-volume
+        secret:
+          secretName: webapp-secrets
+
+---
+# Service para exponer la aplicación
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+spec:
+  selector:
+    app: webapp
+  ports:
+  - port: 80
+    nodePort: 30200
+  type: NodePort
