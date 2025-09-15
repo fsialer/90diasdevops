@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: shared-volume-pod
+  labels:
+    app: shared-volume-demo
+spec:
+  containers:
+  - name: writer
+    image: busybox:latest
+    command: ["/bin/sh", "-c"]
+    args:
+    - |
+      while true; do
+        echo "$(date): Escribiendo datos..." >> /shared/log.txt
+        sleep 10
+      done
+    volumeMounts:
+    - name: shared-data
+      mountPath: /shared
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+  
+  - name: reader
+    image: busybox:latest
+    command: ["/bin/sh", "-c"]
+    args:
+    - |
+      while true; do
+        echo "Contenido del archivo:"
+        cat /shared/log.txt 2>/dev/null || echo "Archivo no encontrado"
+        sleep 15
+      done
+    volumeMounts:
+    - name: shared-data
+      mountPath: /shared
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+  
+  volumes:
+  - name: shared-data
+    emptyDir: {}
+---
