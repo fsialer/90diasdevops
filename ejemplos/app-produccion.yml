@@ -1,0 +1,37 @@
+# Deployment en namespace de producción
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+  namespace: mi-app-prod  # ← Namespace diferente
+spec:
+  replicas: 3  # Más réplicas en producción
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+        ambiente: produccion
+    spec:
+      containers:
+      - name: web
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+
+---
+# Service para producción
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+  namespace: mi-app-prod  # ← Mismo namespace que el deployment
+spec:
+  selector:
+    app: web-app
+  ports:
+  - port: 80
+    nodePort: 30200
+  type: NodePort

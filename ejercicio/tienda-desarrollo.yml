@@ -1,0 +1,100 @@
+# Frontend de la tienda en desarrollo
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: tienda-dev
+  # labels:
+  #   app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+        tipo: web
+    spec:
+      containers:
+      - name: web
+        image: nginx:1.25
+        ports:
+        - containerPort: 80
+        #   name: http
+        # resources:
+        #   requests:
+        #     memory: "64Mi"
+        #     cpu: "50m"
+        #   limits:
+        #     memory: "128Mi"
+        #     cpu: "100m"
+
+---
+# Base de datos en desarrollo
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database
+  namespace: tienda-dev
+  # labels:
+  #   app: database
+  #   environment: development
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database
+  template:
+    metadata:
+      labels:
+        app: database
+        # environment: development
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "dev123"
+        - name: MYSQL_DATABASE
+          value: "tienda_dev"
+        - name: MYSQL_USER
+          value: "devuser"
+        - name: MYSQL_PASSWORD
+          value: "devpass"
+        ports:
+        - containerPort: 3306
+          name: mysql
+        # resources:
+        #   requests:
+       
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: tienda-dev
+spec:
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30080
+  type: NodePort
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database-service
+  namespace: tienda-dev
+spec:
+  selector:
+    app: database
+  ports:
+  - port: 3306
+  type: ClusterIP
