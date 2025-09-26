@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: arc-demo-app
-  namespace: arc-runners
   labels:
     app: arc-demo
 spec:

@@ -41,3 +41,27 @@ subjects:
 - kind: ServiceAccount
   name: mi-runners-gha-rs-no-permission
   namespace: arc-runners
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: arc-runners
+  name: runner-deployment-access
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: runner-deployment-access-binding
+  namespace: arc-runners
+subjects:
+- kind: ServiceAccount
+  name: mi-runners-gha-rs-no-permission
+  namespace: arc-runners
+roleRef:
+  kind: Role
+  name: runner-deployment-access
+  apiGroup: rbac.authorization.k8s.io
