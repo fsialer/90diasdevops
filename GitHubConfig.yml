@@ -1,0 +1,9 @@
+apiVersion: actions.github.com/v1alpha1
+kind: GitHubConfig
+metadata:
+  name: github-config
+  namespace: arc-runners
+spec:
+  githubTokenRef:
+    name: github-auth-secret
+    key: github_token

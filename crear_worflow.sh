@@ -1,0 +1,50 @@
+#!/bin/bash
+cat > .github/workflows/deploy.yml << 'EOF'
+name: Deploy con ARC
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: mi-runners  # Usa tus runners de ARC
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      
+    - name: Ver info del runner
+      run: |
+        echo "🏃‍♂️ Ejecutándose en runner ARC"
+        echo "Hostname: $(hostname)"
+        echo "Usuario: $(whoami)"
+        kubectl version --client
+        
+    - name: Verificar cluster
+      run: |
+        echo "🔍 Verificando conexión a Kubernetes..."
+        kubectl get nodes
+        kubectl get namespaces
+        
+    - name: Aplicar manifiestos
+      run: |
+        echo "🚀 Desplegando aplicación..."
+        kubectl apply -f k8s/deployment.yaml
+        kubectl apply -f k8s/service.yaml
+        
+    - name: Esperar despliegue
+      run: |
+        echo "⏳ Esperando que el despliegue esté listo..."
+        kubectl rollout status deployment/arc-demo-app --timeout=300s
+        
+    - name: Verificar resultado
+      run: |
+        echo "✅ Estado final:"
+        kubectl get pods -l app=arc-demo
+        kubectl get service arc-demo-service
+        echo ""
+        echo "🌐 Aplicación disponible en:"
+        echo "http://localhost:30080 (si tienes port-forward)"
+EOF
