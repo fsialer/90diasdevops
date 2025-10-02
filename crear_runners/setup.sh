@@ -18,13 +18,14 @@ kubectl apply -f secret_github.yml
 
 # Instalar Runner Scale Set
 
-GITHUB_CONFIG_URL="git@github.com:fsialer/90diasdevops.git"
+GITHUB_CONFIG_URL="https://github.com/fsialer/90diasdevops"
+export GITHUB_CONFIG_URL
 
 # Instalar runners
 helm install mi-runners \
     --namespace arc-runners \
     --set githubConfigUrl="$GITHUB_CONFIG_URL" \
-    --set githubConfigSecret=github-auth \
+    --set githubConfigSecret=github-auth-secret \
     --set maxRunners=3 \
     --set minRunners=0 \
     oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
