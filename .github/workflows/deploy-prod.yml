@@ -23,6 +23,11 @@ jobs:
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
         chmod +x kubectl
         sudo mv kubectl /usr/local/bin/
+    - name: Cache
+      uses: actions/cache@v4.3.0
+      with:
+        # A list of files, directories, and wildcard patterns to cache and restore
+        path: "dd"
       
     - name: Confirmación de producción
       run: |
