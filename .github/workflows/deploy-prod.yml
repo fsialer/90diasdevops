@@ -1,4 +1,4 @@
-name: 🏭 Deploy a PRODUCCIÓN
+name: 🏭 Deploy a PRODUCCION
 
 on:
   workflow_dispatch:
