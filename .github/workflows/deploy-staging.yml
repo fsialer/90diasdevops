@@ -1,0 +1,42 @@
+name: 🎭 Deploy a STAGING
+
+on:
+  push:
+    branches: [semana0602]
+  workflow_dispatch:
+
+jobs:
+  deploy-staging:
+    name: Desplegar a Staging
+    runs-on: mi-runners
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+
+    - name: Setup kubectl
+      run: |
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x kubectl
+        sudo mv kubectl /usr/local/bin/
+      
+    - name: Desplegar a staging
+      run: |
+        echo "🎭 Desplegando a STAGING..."
+        kubectl apply -f k8s/staging/app-staging.yml
+        
+    - name: Esperar que esté listo
+      run: |
+        kubectl rollout status deployment/mi-app -n staging --timeout=300s
+        
+    - name: Verificar deployment
+      run: |
+        echo "✅ Estado en STAGING:"
+        kubectl get pods -n staging
+        echo "🌐 Accesible en: http://localhost:30002"
+        
+    - name: Test básico
+      run: |
+        echo "🧪 Probando conectividad..."
+        kubectl run test-staging --image=curlimages/curl --rm -i --restart=Never -- \
+          curl -s http://mi-app-service.staging.svc.cluster.local || echo "Test completado"

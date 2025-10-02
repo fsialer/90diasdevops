@@ -1,0 +1,56 @@
+# Deployment para desarrollo
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mi-app
+  namespace: dev
+  labels:
+    app: mi-app
+    environment: development
+spec:
+  replicas: 1  # Solo 1 réplica en dev
+  selector:
+    matchLabels:
+      app: mi-app
+  template:
+    metadata:
+      labels:
+        app: mi-app
+        environment: development
+    spec:
+      containers:
+      - name: app
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        env:
+        - name: ENVIRONMENT
+          value: "DEVELOPMENT"
+        - name: DEBUG
+          value: "true"
+        - name: VERSION
+          value: "dev-build"
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "25m"
+          limits:
+            memory: "64Mi"
+            cpu: "50m"
+---
+# Service para desarrollo
+apiVersion: v1
+kind: Service
+metadata:
+  name: mi-app-service
+  namespace: dev
+  labels:
+    app: mi-app
+spec:
+  selector:
+    app: mi-app
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30001
+  type: NodePort
