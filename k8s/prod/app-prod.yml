@@ -1,0 +1,69 @@
+# Deployment para producción
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mi-app
+  namespace: prod
+  labels:
+    app: mi-app
+    environment: production
+spec:
+  replicas: 3  # 3 réplicas en producción
+  selector:
+    matchLabels:
+      app: mi-app
+  template:
+    metadata:
+      labels:
+        app: mi-app
+        environment: production
+    spec:
+      containers:
+      - name: app
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        env:
+        - name: ENVIRONMENT
+          value: "PRODUCTION"
+        - name: DEBUG
+          value: "false"
+        - name: VERSION
+          value: "prod-v1.0.0"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        # Health checks para producción
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+# Service para producción
+apiVersion: v1
+kind: Service
+metadata:
+  name: mi-app-service
+  namespace: prod
+  labels:
+    app: mi-app
+spec:
+  selector:
+    app: mi-app
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30003
+  type: NodePort
