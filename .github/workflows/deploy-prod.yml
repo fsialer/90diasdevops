@@ -1,70 +1,75 @@
 name: 🏭 Deploy a PRODUCCION
 
 on:
+  push:
+    branches: [semana0602_develop]
   workflow_dispatch:
-    inputs:
-      confirm:
-        description: '¿Confirmas el deploy a PRODUCCIÓN? (escribe: SI)'
-        required: true
-        default: 'NO'
+
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       confirm:
+#         description: '¿Confirmas el deploy a PRODUCCIÓN? (escribe: SI)'
+#         required: true
+#         default: 'NO'
 
 jobs:
-  deploy-production:
-    name: Desplegar a Producción
-    runs-on: mi-runners
-    if: github.event.inputs.confirm == 'SI'
+  # deploy-production:
+  #   name: Desplegar a Producción
+  #   runs-on: mi-runners
+  #   if: github.event.inputs.confirm == 'SI'
     
     steps:
     - name: Checkout código
       uses: actions/checkout@v4
 
-    - name: Setup kubectl
-      run: |
-        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-        chmod +x kubectl
-        sudo mv kubectl /usr/local/bin/
+    # - name: Setup kubectl
+    #   run: |
+    #     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    #     chmod +x kubectl
+    #     sudo mv kubectl /usr/local/bin/
       
-    - name: Confirmación de producción
-      run: |
-        echo "🚨 DESPLEGANDO A PRODUCCIÓN 🚨"
-        echo "Rama: ${{ github.ref_name }}"
-        echo "Commit: ${{ github.sha }}"
+    # - name: Confirmación de producción
+    #   run: |
+    #     echo "🚨 DESPLEGANDO A PRODUCCIÓN 🚨"
+    #     echo "Rama: ${{ github.ref_name }}"
+    #     echo "Commit: ${{ github.sha }}"
         
-    - name: Backup actual
-      run: |
-        echo "💾 Creando backup..."
-        kubectl get deployment mi-app -n prod -o yml > backup-prod.yml 2>/dev/null || echo "No hay deployment previo"
+    # - name: Backup actual
+    #   run: |
+    #     echo "💾 Creando backup..."
+    #     kubectl get deployment mi-app -n prod -o yml > backup-prod.yml 2>/dev/null || echo "No hay deployment previo"
         
-    - name: Desplegar a producción
-      run: |
-        echo "🏭 Desplegando a PRODUCCIÓN..."
-        kubectl apply -f k8s/prod/app-prod.yml
+    # - name: Desplegar a producción
+    #   run: |
+    #     echo "🏭 Desplegando a PRODUCCIÓN..."
+    #     kubectl apply -f k8s/prod/app-prod.yml
         
-    - name: Esperar deployment
-      run: |
-        kubectl rollout status deployment/mi-app -n prod --timeout=600s
+    # - name: Esperar deployment
+    #   run: |
+    #     kubectl rollout status deployment/mi-app -n prod --timeout=600s
         
-    - name: Verificar resultado
-      run: |
-        echo "✅ Estado final en PRODUCCIÓN:"
-        kubectl get pods -n prod -o wide
-        kubectl get service -n prod
-        echo "🌐 Accesible en: http://localhost:30003"
+    # - name: Verificar resultado
+    #   run: |
+    #     echo "✅ Estado final en PRODUCCIÓN:"
+    #     kubectl get pods -n prod -o wide
+    #     kubectl get service -n prod
+    #     echo "🌐 Accesible en: http://localhost:30003"
         
-    - name: Test de producción
-      run: |
-        echo "🧪 Test final de producción..."
-        kubectl run test-prod --image=curlimages/curl --rm -i --restart=Never -- \
-          curl -s http://mi-app-service.prod.svc.cluster.local || echo "Test completado"
+    # - name: Test de producción
+    #   run: |
+    #     echo "🧪 Test final de producción..."
+    #     kubectl run test-prod --image=curlimages/curl --rm -i --restart=Never -- \
+    #       curl -s http://mi-app-service.prod.svc.cluster.local || echo "Test completado"
         
-    - name: Rollback si algo falla
-      if: failure()
-      run: |
-        echo "🔙 ¡Algo falló! Haciendo rollback..."
-        if [ -f backup-prod.yml ]; then
-          kubectl apply -f backup-prod.yml
-          echo "✅ Rollback desde backup completado"
-        else
-          kubectl rollout undo deployment/mi-app -n prod
-          echo "✅ Rollback automático completado"
-        fi
+    # - name: Rollback si algo falla
+    #   if: failure()
+    #   run: |
+    #     echo "🔙 ¡Algo falló! Haciendo rollback..."
+    #     if [ -f backup-prod.yml ]; then
+    #       kubectl apply -f backup-prod.yml
+    #       echo "✅ Rollback desde backup completado"
+    #     else
+    #       kubectl rollout undo deployment/mi-app -n prod
+    #       echo "✅ Rollback automático completado"
+    #     fi
