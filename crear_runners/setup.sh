@@ -1,3 +1,4 @@
+#!/bin/bash
 # Añadir repo de Helm
 helm repo add actions-runner-controller https://actions-runner-controller.github.io/actions-runner-controller
 
@@ -15,6 +16,9 @@ kubectl create namespace arc-runners
 
 # crear secret github
 kubectl apply -f secret_github.yml
+
+# Asignar permisos
+kubectl apply -f rbac_runner.yml 
 
 # Instalar Runner Scale Set
 
