@@ -1,0 +1,56 @@
+# Deployment para staging
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mi-app
+  namespace: staging
+  labels:
+    app: mi-app
+    environment: staging
+spec:
+  replicas: 2  # 2 réplicas en staging
+  selector:
+    matchLabels:
+      app: mi-app
+  template:
+    metadata:
+      labels:
+        app: mi-app
+        environment: staging
+    spec:
+      containers:
+      - name: app
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        env:
+        - name: ENVIRONMENT
+          value: "STAGING"
+        - name: DEBUG
+          value: "false"
+        - name: VERSION
+          value: "staging-build"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+---
+# Service para staging
+apiVersion: v1
+kind: Service
+metadata:
+  name: mi-app-service
+  namespace: staging
+  labels:
+    app: mi-app
+spec:
+  selector:
+    app: mi-app
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30002
+  type: NodePort

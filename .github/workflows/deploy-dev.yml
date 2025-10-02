@@ -1,0 +1,36 @@
+name: 🛠️ Deploy a DEV
+
+on:
+  push:
+    branches: [semana0602_develop]
+  workflow_dispatch:
+
+jobs:
+  deploy-dev:
+    name: Desplegar a Desarrollo
+    runs-on: mi-runners
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+      
+    - name: Verificar cluster
+      run: |
+        echo "🔍 Verificando conexión..."
+        kubectl get nodes
+        
+    - name: Desplegar a desarrollo
+      run: |
+        echo "🛠️ Desplegando a DESARROLLO..."
+        kubectl apply -f k8s/dev/app-dev.yml
+        
+    - name: Esperar que esté listo
+      run: |
+        echo "⏳ Esperando deployment..."
+        kubectl rollout status deployment/mi-app -n dev --timeout=300s
+        
+    - name: Ver resultado
+      run: |
+        echo "✅ Estado en DEV:"
+        kubectl get pods -n dev
+        echo "🌐 Accesible en: http://localhost:30001"
