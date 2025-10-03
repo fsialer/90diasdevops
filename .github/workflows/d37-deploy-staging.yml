@@ -23,7 +23,7 @@ jobs:
     - name: Desplegar a staging
       run: |
         echo "🎭 Desplegando a STAGING..."
-        kubectl apply -f k8s/staging/app-staging.yml
+        kubectl apply -f s6/d37/k8s/staging/app-staging.yml
         
     - name: Esperar que esté listo
       run: |
