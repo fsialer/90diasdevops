@@ -28,7 +28,7 @@ jobs:
     - name: Desplegar a desarrollo
       run: |
         echo "🛠️ Desplegando a DESARROLLO..."
-        kubectl apply -f k8s/dev/app-dev.yml
+        kubectl apply -f s6/d37/k8s/dev/app-dev.yml
         
     - name: Esperar que esté listo
       run: |
