@@ -1,4 +1,8 @@
 #!/bin/bash
+# Crear ambientes
+kubectl create namespace dev
+kubectl create namespace staging
+kubectl create namespace prod
 # Añadir repo de Helm
 helm repo add actions-runner-controller https://actions-runner-controller.github.io/actions-runner-controller
 
