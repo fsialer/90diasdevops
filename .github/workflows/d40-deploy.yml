@@ -30,16 +30,16 @@ jobs:
         curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
     - name: Deploy con Helm
+# export KUBECONFIG=$PWD/kubeconfig
       run: |
-        export KUBECONFIG=$PWD/kubeconfig
         helm upgrade --install mi-app ./charts/mi-app \
           --namespace default \
           --create-namespace \
           --wait
 
     - name: Verificar deploy
+# export KUBECONFIG=$PWD/kubeconfig
       run: |
-        export KUBECONFIG=$PWD/kubeconfig
         kubectl get pods
         kubectl get services
 
