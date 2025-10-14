@@ -49,13 +49,11 @@ jobs:
       run: |
         helm upgrade --install mi-app-dev ./s6/d40/charts/mi-app \
         --values ./s6/d40/charts/mi-app/values-dev.yaml \
-        --namespace dev \
-        --create-namespace
+        --namespace dev
         
     - name: Deploy a Prod  
       if: github.ref == 'refs/heads/main'
       run: |
         helm upgrade --install mi-app-prod ./s6/d40/charts/mi-app \
         --values ./s6/d40/charts/mi-app/values-prod.yaml \
-        --namespace prod \
-        --create-namespace
+        --namespace prod
