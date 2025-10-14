@@ -1,0 +1,54 @@
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+
+    - name: Configurar kubectl
+      run: |
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
+        export KUBECONFIG=$PWD/kubeconfig
+        kubectl cluster-info
+
+    - name: Instalar Helm
+      run: |
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+    - name: Deploy con Helm
+      run: |
+        export KUBECONFIG=$PWD/kubeconfig
+        helm upgrade --install mi-app ./charts/mi-app \
+          --namespace default \
+          --create-namespace \
+          --wait
+
+    - name: Verificar deploy
+      run: |
+        export KUBECONFIG=$PWD/kubeconfig
+        kubectl get pods
+        kubectl get services
+
+    - name: Deploy a Dev
+      if: github.ref == 'refs/heads/d40_develop'
+      run: |
+        helm upgrade --install mi-app-dev ./charts/mi-app \
+        --values ./charts/mi-app/values-dev.yaml \
+        --namespace dev \
+        --create-namespace
+        
+    - name: Deploy a Prod  
+      if: github.ref == 'refs/heads/main'
+      run: |
+        helm upgrade --install mi-app-prod ./charts/mi-app \
+        --values ./charts/mi-app/values-prod.yaml \
+        --namespace prod \
+        --create-namespace
