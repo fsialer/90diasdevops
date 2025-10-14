@@ -1,0 +1,10 @@
+replicaCount: 3
+image:
+  repository: nginx
+  tag: "1.21"
+service:
+  type: LoadBalancer
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
