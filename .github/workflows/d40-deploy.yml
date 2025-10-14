@@ -32,7 +32,7 @@ jobs:
     - name: Deploy con Helm
 # export KUBECONFIG=$PWD/kubeconfig
       run: |
-        helm upgrade --install mi-app ./charts/mi-app \
+        helm upgrade --install mi-app ./s6/d40/charts/mi-app \
           --namespace default \
           --create-namespace \
           --wait
@@ -46,15 +46,15 @@ jobs:
     - name: Deploy a Dev
       if: github.ref == 'refs/heads/d40_develop'
       run: |
-        helm upgrade --install mi-app-dev ./charts/mi-app \
-        --values ./charts/mi-app/values-dev.yaml \
+        helm upgrade --install mi-app-dev ./s6/d40/charts/mi-app \
+        --values ./s6/d40/charts/mi-app/values-dev.yaml \
         --namespace dev \
         --create-namespace
         
     - name: Deploy a Prod  
       if: github.ref == 'refs/heads/main'
       run: |
-        helm upgrade --install mi-app-prod ./charts/mi-app \
-        --values ./charts/mi-app/values-prod.yaml \
+        helm upgrade --install mi-app-prod ./s6/d40/charts/mi-app \
+        --values ./s6/d40/charts/mi-app/values-prod.yaml \
         --namespace prod \
         --create-namespace
