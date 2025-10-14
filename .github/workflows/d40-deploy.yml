@@ -35,7 +35,6 @@ jobs:
        
         helm upgrade --install mi-app ./s6/d40/charts/mi-app \
           --namespace default \
-          
           --wait
 
     - name: Verificar deploy
