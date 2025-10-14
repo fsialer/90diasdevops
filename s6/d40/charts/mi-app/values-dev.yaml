@@ -1,0 +1,10 @@
+replicaCount: 1
+image:
+  repository: feralexis007/homer_page
+  pullPolicy: IfNotPresent
+  tag: "latest"
+service:
+  type: NodePort
+  nodePort: 30080
+env:
+  NODE_ENV: development

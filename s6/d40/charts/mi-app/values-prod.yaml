@@ -1,0 +1,13 @@
+replicaCount: 3
+image:
+  repository: feralexis007/homer_page
+  pullPolicy: IfNotPresent
+  tag: "latest"
+service:
+  type: LoadBalancer
+env:
+  NODE_ENV: production
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
