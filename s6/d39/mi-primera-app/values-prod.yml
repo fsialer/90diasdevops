@@ -8,3 +8,6 @@ resources:
   limits:
     cpu: 200m
     memory: 256Mi
+serviceAccount:
+  create: false       # ← Esto está causando el error
+  name: default  # ← Probablemente definido en tus `values-prod.yaml`
