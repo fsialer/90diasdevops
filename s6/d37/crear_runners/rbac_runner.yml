@@ -140,3 +140,110 @@ roleRef:
   kind: Role
   name: gha-deployer
   apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: helm-deployer
+  namespace: default
+rules:
+- apiGroups: ["", "apps", "extensions", "batch"]
+  resources: ["*"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: helm-deployer-binding
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: mi-runners-gha-rs-no-permission
+  namespace: arc-runners
+roleRef:
+  kind: Role
+  name: helm-deployer
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: read-pods-and-services
+  namespace: arc-runners
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: bind-read-pods-and-services
+  namespace: arc-runners
+subjects:
+- kind: ServiceAccount
+  name: mi-runners-gha-rs-no-permission
+  namespace: arc-runners
+roleRef:
+  kind: Role
+  name: read-pods-and-services
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: sa-reader
+  namespace: prod
+rules:
+- apiGroups: [""]
+  resources: ["serviceaccounts"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: bind-sa-reader
+  namespace: prod
+subjects:
+- kind: ServiceAccount
+  name: mi-runners-gha-rs-no-permission
+  namespace: arc-runners
+roleRef:
+  kind: Role
+  name: sa-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: gha-deployer
+  namespace: default
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: gha-deployer-binding
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: mi-runners-gha-rs-no-permission     # <- nombre exacto del SA
+    namespace: arc-runners                    # <- namespace donde vive el SA
+roleRef:
+  kind: Role
+  name: gha-deployer
+  apiGroup: rbac.authorization.k8s.io
+---
