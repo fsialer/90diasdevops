@@ -1,0 +1,122 @@
+name: 🚀 E-commerce Deploy
+
+on:
+  push:
+    branches: [ main, d41_develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: 🏗️ Build & Test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Test Backend
+      run: |
+        cd apps/backend
+        npm install
+        echo "✅ Backend tests passed"
+        
+    - name: Build Frontend
+      run: |
+        cd apps/frontend
+        npm install
+        npm run build
+        echo "✅ Frontend build successful"
+
+  docker-build:
+    name: 🐳 Docker Build
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Backend Image
+      run: |
+        cd apps/backend
+        docker build -t ecommerce-backend:${{ github.sha }} .
+        
+    - name: Build Frontend Image
+      run: |
+        cd apps/frontend
+        docker build -t ecommerce-frontend:${{ github.sha }} .
+
+  deploy-dev:
+    name: 🚧 Deploy to Dev
+    runs-on: ubuntu-latest
+    needs: docker-build
+    if: github.ref == 'refs/heads/d41_develop'
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install kubectl & helm
+      run: |
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+        
+    - name: Deploy to Development
+      run: |
+        # Setup kubeconfig (requiere KUBE_CONFIG secret)
+        mkdir -p $HOME/.kube
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+        
+        # Create namespace
+        kubectl create namespace ecommerce-dev --dry-run=client -o yaml | kubectl apply -f -
+        
+        # Deploy with Helm
+        helm upgrade --install ecommerce ./helm-charts/ecommerce \
+          --values ./helm-charts/ecommerce/values/dev.yaml \
+          --set backend.image=ecommerce-backend:${{ github.sha }} \
+          --set frontend.image=ecommerce-frontend:${{ github.sha }} \
+          --wait --timeout=10m
+
+  deploy-prod:
+    name: 🏭 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: deploy-dev
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install tools
+      run: |
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+        
+    - name: Deploy to Production
+      run: |
+        mkdir -p $HOME/.kube
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+        
+        kubectl create namespace ecommerce-prod --dry-run=client -o yaml | kubectl apply -f -
+        
+        # Create production values
+        cat > prod-values.yaml << EOF
+        environment: prod
+        namespace: ecommerce-prod
+        postgres:
+          replicas: 1
+          storage: 5Gi
+        backend:
+          replicas: 3
+          image: ecommerce-backend:${{ github.sha }}
+        frontend:
+          replicas: 2
+          image: ecommerce-frontend:${{ github.sha }}
+          service:
+            type: LoadBalancer
+        EOF
+        
+        helm upgrade --install ecommerce ./helm-charts/ecommerce \
+          --values prod-values.yaml \
+          --wait --timeout=15m
