@@ -1,5 +1,5 @@
 environment: dev
-namespace: ecommerce-dev2
+namespace: ecommerce-dev
 
 postgres:
   replicas: 1
