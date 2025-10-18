@@ -20,13 +20,13 @@ jobs:
         
     - name: Test Backend
       run: |
-        cd apps/backend
+        cd s6/d41/ecommerce-k8s/apps/backend
         npm install
         echo "✅ Backend tests passed"
         
     - name: Build Frontend
       run: |
-        cd apps/frontend
+        cd s6/d41/ecommerce-k8s/apps/frontend
         npm install
         npm run build
         echo "✅ Frontend build successful"
