@@ -52,3 +52,49 @@ helm upgrade ecommerce ./helm-charts/ecommerce \
 
 # Pasos para obtener kubeconfig
 cp ~/.kube/config kubeconfig-ngrok.yaml
+
+# Testing completo
+# Hacer ejecutable el script
+chmod +x scripts/deploy.sh
+
+# Deploy completo
+./scripts/deploy.sh dev
+
+# Verificar health checks
+kubectl port-forward -n ecommerce-dev svc/backend-service 3000:3000 &
+sleep 5
+curl http://localhost:3000/health
+curl http://localhost:3000/health/ready
+
+# Verificar frontend
+kubectl port-forward -n ecommerce-dev svc/frontend-service 8080:80 &
+sleep 5
+curl http://localhost:8080/health
+
+# Matar port-forwards
+pkill -f "kubectl port-forward"
+
+# Ver logs
+kubectl logs -f -l app=backend -n ecommerce-dev --tail=10
+
+# Acceso a la aplicación
+# Obtener URL de acceso
+kubectl get svc -n ecommerce-dev frontend-service
+
+# Si es NodePort (desarrollo)
+echo "🌐 Aplicación disponible en: http://localhost:30080"
+
+# Monitorear recursos
+kubectl top pods -n ecommerce-dev
+kubectl get events -n ecommerce-dev --sort-by='.lastTimestamp'
+
+#Verificación final
+# Estado completo del deployment
+kubectl get all -n ecommerce-dev
+
+# Health status de todos los servicios  
+kubectl get pods -n ecommerce-dev -o wide
+
+# Acceso a la aplicación
+echo "✅ E-commerce disponible en: http://localhost:30080"
+echo "✅ Todos los conceptos de la semana integrados exitosamente"

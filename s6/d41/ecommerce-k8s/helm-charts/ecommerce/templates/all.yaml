@@ -122,7 +122,7 @@ spec:
       containers:
       - name: backend
         image: {{ .Values.backend.image }}
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3000
         env:
@@ -181,7 +181,7 @@ spec:
       containers:
       - name: frontend
         image: {{ .Values.frontend.image }}
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
         livenessProbe:
