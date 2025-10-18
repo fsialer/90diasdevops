@@ -40,12 +40,12 @@ jobs:
     
     - name: Build Backend Image
       run: |
-        cd apps/backend
+        cd s6/d41/ecommerce-k8s/apps/backend
         docker build -t ecommerce-backend:${{ github.sha }} .
         
     - name: Build Frontend Image
       run: |
-        cd apps/frontend
+        cd s6/d41/ecommerce-k8s/apps/frontend
         docker build -t ecommerce-frontend:${{ github.sha }} .
 
   deploy-dev:
@@ -72,8 +72,8 @@ jobs:
         kubectl create namespace ecommerce-dev --dry-run=client -o yaml | kubectl apply -f -
         
         # Deploy with Helm
-        helm upgrade --install ecommerce ./helm-charts/ecommerce \
-          --values ./helm-charts/ecommerce/values/dev.yaml \
+        helm upgrade --install ecommerce ./s6/d41/ecommerce-k8s/helm-charts/ecommerce \
+          --values ./s6/d41/ecommerce-k8s/helm-charts/ecommerce/values/dev.yaml \
           --set backend.image=ecommerce-backend:${{ github.sha }} \
           --set frontend.image=ecommerce-frontend:${{ github.sha }} \
           --wait --timeout=10m
@@ -117,6 +117,6 @@ jobs:
             type: LoadBalancer
         EOF
         
-        helm upgrade --install ecommerce ./helm-charts/ecommerce \
+        helm upgrade --install ecommerce ./s6/d41/ecommerce-k8s/helm-charts/ecommerce \
           --values prod-values.yaml \
           --wait --timeout=15m
