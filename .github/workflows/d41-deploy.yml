@@ -70,12 +70,12 @@ jobs:
         
         # Create namespace
         kubectl create namespace ecommerce-dev --dry-run=client -o yaml | kubectl apply -f -
-        
+
         # Deploy with Helm
         helm upgrade --install ecommerce ./s6/d41/ecommerce-k8s/helm-charts/ecommerce \
           --values ./s6/d41/ecommerce-k8s/helm-charts/ecommerce/values/dev.yaml \
-          --set backend.image=ecommerce-backend:${{ github.sha }} \
-          --set frontend.image=ecommerce-frontend:${{ github.sha }} \
+          --set backend.image=ecommerce-backend:latest \
+          --set frontend.image=ecommerce-frontend:latest \
           --wait --timeout=10m
 
   deploy-prod:
