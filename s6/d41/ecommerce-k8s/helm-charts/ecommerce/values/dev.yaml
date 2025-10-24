@@ -1,0 +1,36 @@
+environment: dev
+namespace: ecommerce-dev
+
+postgres:
+  replicas: 1
+  storage: 1Gi
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 250m
+
+redis:
+  replicas: 1
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+
+backend:
+  replicas: 1
+  image: ecommerce-backend:latest
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 200m
+
+frontend:
+  replicas: 1
+  image: ecommerce-frontend:latest
+  service:
+    type: NodePort
+    nodePort: 30081
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
