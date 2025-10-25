@@ -78,7 +78,8 @@ jobs:
                 cd ./s6/d42/charts
                 helm upgrade --install vote ./vote --namespace voting-app \
                   --values ./vote/values.yaml \
-                  --set image.repository=${{ secrets.DOCKER_USERNAME }}/vote-front:${{ github.sha }} 
+                  --set image.repository=${{ secrets.DOCKER_USERNAME }}/vote-front \
+                  --set image.tag=${{ github.sha }}
                   
             - name: Deploy to dev worker
               run: |
@@ -86,7 +87,8 @@ jobs:
                 cd ./s6/d42/charts
                 helm upgrade --install worker ./worker --namespace voting-app \
                   --values ./worker/values.yaml \
-                  --set image.repository=${{ secrets.DOCKER_USERNAME }}/worker-backend:${{ github.sha }} 
+                  --set image.repository=${{ secrets.DOCKER_USERNAME }}/worker-backend \
+                  --set image.tag=${{ github.sha }}
 
             - name: Deploy to dev result
               run: |
@@ -94,7 +96,8 @@ jobs:
                 cd ./s6/d42/charts
                 helm upgrade --install result ./result --namespace voting-app \
                   --values ./result/values.yaml \
-                  --set image.repository=${{ secrets.DOCKER_USERNAME }}/result-frontend:${{ github.sha }}
+                  --set image.repository=${{ secrets.DOCKER_USERNAME }}/result-frontend \
+                  --set image.tag=${{ github.sha }}
 
             - name: Deploy to dev redis
               run: |
