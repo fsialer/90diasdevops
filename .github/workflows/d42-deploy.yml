@@ -1,78 +1,111 @@
 name: Vote Deploy
 on:
     push:
-        branches: [main, d42_develop]
-        paths: [s6/d42/**]
+        branches: [d42_develop]
     workflow_dispatch:
 jobs:
     docker-build:
         name: Docker Build
-        runs-on: self-hosted
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v4
 
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                username: ${{ secrets.DOCKER_USERNAME }}
+                password: ${{ secrets.DOCKER_PASSWORD }}
+
             - name: Build vote Image
               run: |
-                  cd rox-devops-project90/roxs-voting-app/vote
-                  docker build -t vote-front:${{ github.sha }} .
+                  cd ./s6/d42/roxs-devops-project90/roxs-voting-app/vote
+                  docker build -t ${{ secrets.DOCKER_USERNAME }}/vote-front:${{ github.sha }} .
+                  docker push ${{ secrets.DOCKER_USERNAME }}/vote-front:${{ github.sha }}
+
             - name: Build worker Image
               run: |
-                  cd rox-devops-project90/roxs-voting-app/worker
-                  docker build -t worker-backend:${{ github.sha }} .
+                  cd ./s6/d42/roxs-devops-project90/roxs-voting-app/worker
+                  docker build -t ${{ secrets.DOCKER_USERNAME }}/worker-backend:${{ github.sha }} .
+                  docker push ${{ secrets.DOCKER_USERNAME }}/worker-backend:${{ github.sha }}
 
             - name: Build result Image
               run: |
-                  cd rox-devops-project90/roxs-voting-app/result
-                  docker build -t vote-frontend:${{ github.sha }} .
+                  cd ./s6/d42/roxs-devops-project90/roxs-voting-app/result
+                  docker build -t ${{ secrets.DOCKER_USERNAME }}/result-frontend:${{ github.sha }} .
+                  docker push ${{ secrets.DOCKER_USERNAME }}/result-frontend:${{ github.sha }}
     deploy:
         name: Deploy
-        runs-on: self-hosted
+        runs-on: ubuntu-latest
         needs: docker-build
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v4
+
             - name: Install kubectl & helm
               run: |
                 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-                chmod +x kubectl
-                sudo mv kubectl /usr/local/bin/
+                chmod +x kubectl && sudo mv kubectl /usr/local/bin/
                 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-            - name: Create namespace dev-customer
-              run: |
-                # Setup kubeconfig (requiere KUBE_CONFIG secret)
                 mkdir -p $HOME/.kube
                 echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
-                cd voting-app-k8s
-                kubectl apply -f ./01-namespace.yml
-            - name: Configure namespace & storage & config & secrets
+            - name: Add Helm Repositories
               run: |
-                # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                mkdir -p $HOME/.kube
-                echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
-                cd voting-app-k8s
-                kubectl apply -f ./02-storage.yml
-                kbectl apply -f ./03-configs-secrets.yml
-            - name: Deploy to dev customer
-              run: |
-                # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                mkdir -p $HOME/.kube
-                echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
-                cd charts
-                helm upgrade --install vote . --namespace voting-app \
-                  --values ./vote/values.yaml
-                  --set vote.image=vote-front:${{ github.sha }} 
-
-                helm upgrade --install worker . --namespace voting-app \
-                  --values ./worker/values.yaml
-                  --set worker.image=worker-backend:${{ github.sha }} \
-                  --set result.image=vote-frontend:${{ github.sha }}
-
-                helm upgrade --install result . --namespace voting-app \
-                  --values ./result/values.yaml
-                  --set result.image=vote-frontend:${{ github.sha }}
-                
+                helm repo add bitnami https://charts.bitnami.com/bitnami
                 helm repo update
+            - name: Create namespace
+              run: |
+                # Setup kubeconfig (requiere KUBE_CONFIG secret)
+                cd ./s6/d42/voting-app-k8s
+                kubectl create namespace voting-app --dry-run=client -o yaml | kubectl apply -f -
+                # kubectl apply -f ./01-namespace.yml --validate=false
+
+            - name: Configure storage
+              run: |
+                # Setup kubeconfig (requiere KUBE_CONFIG secret)
+                cd ./s6/d42/voting-app-k8s
+                kubectl apply -f ./02-storage.yml --validate=false
+
+            - name: Configure config&secrets
+              run: |
+                # Setup kubeconfig (requiere KUBE_CONFIG secret)
+                cd ./s6/d42/voting-app-k8s
+                kubectl apply -f ./03-configs-secrets.yml --validate=false
+
+            - name: Deploy to dev vote
+              run: |
+                # Setup kubeconfig (requiere KUBE_CONFIG secret)
+                cd ./s6/d42/charts
+                helm upgrade --install vote ./vote --namespace voting-app \
+                  --values ./vote/values.yaml \
+                  --set image.repository=${{ secrets.DOCKER_USERNAME }}/vote-front \
+                  --set image.tag=${{ github.sha }}
+                  
+            - name: Deploy to dev worker
+              run: |
+                # Setup kubeconfig (requiere KUBE_CONFIG secret)
+                cd ./s6/d42/charts
+                helm upgrade --install worker ./worker --namespace voting-app \
+                  --values ./worker/values.yaml \
+                  --set image.repository=${{ secrets.DOCKER_USERNAME }}/worker-backend \
+                  --set image.tag=${{ github.sha }}
+
+            - name: Deploy to dev result
+              run: |
+                # Setup kubeconfig (requiere KUBE_CONFIG secret)
+                cd ./s6/d42/charts
+                helm upgrade --install result ./result --namespace voting-app \
+                  --values ./result/values.yaml \
+                  --set image.repository=${{ secrets.DOCKER_USERNAME }}/result-frontend \
+                  --set image.tag=${{ github.sha }}
+
+            - name: Deploy to dev redis
+              run: |
+                # Setup kubeconfig (requiere KUBE_CONFIG secret)
+                cd ./s6/d42/charts
                 helm upgrade --install redis bitnami/redis --values ./redis/values-redis.yaml -n voting-app
+            - name: Deploy to dev postgres
+              run: |
+                # Setup kubeconfig (requiere KUBE_CONFIG secret)
+                cd ./s6/d42/charts
                 helm upgrade --install postgres bitnami/postgresql --values ./postgres/values-postgres.yaml -n voting-app
-                echo "Deployment completed successfully."
