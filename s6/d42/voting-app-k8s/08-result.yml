@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: result
+  namespace: voting-app
+  labels:
+    project: vote-app
+    app: result
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: result
+  template:
+    metadata:
+      labels:
+        app: result
+    spec:
+      containers:
+      - name: result
+        image: result:latest
+        ports:
+          - containerPort: 3000
+        env:
+          - name: DATABASE_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: vote-config
+                key: postgres_host
+          - name: DATABASE_USER
+            valueFrom:
+              secretKeyRef:
+                name: vote-secrets
+                key: postgres_user
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: vote-secrets
+                key: postgres_pwd
+          - name: DATABASE_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: vote-config
+                key: postgres_db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: result-service
+  namespace: voting-app
+spec:
+  type: NodePort
+  selector:
+    app: result
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000

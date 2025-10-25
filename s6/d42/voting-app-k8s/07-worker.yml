@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: voting-app
+  labels:
+    project: vote-app
+    app: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      containers:
+      - name: worker
+        image: worker:latest
+        ports:
+          - containerPort: 3000
+        env:
+          - name: REDIS_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: vote-config
+                key: redis_host
+          - name: DATABASE_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: vote-config
+                key: postgres_host
+          - name: DATABASE_USER
+            valueFrom:
+              secretKeyRef:
+                name: vote-secrets
+                key: postgres-user
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: vote-secrets
+                key: postgres-pwd
+          - name: DATABASE_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: vote-config
+                key: postgres-db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: worker-service
+  namespace: voting-app
+spec:
+  type: ClusterIP
+  selector:
+    app: worker
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
