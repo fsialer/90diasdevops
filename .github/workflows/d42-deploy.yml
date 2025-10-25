@@ -49,6 +49,10 @@ jobs:
                 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
                 mkdir -p $HOME/.kube
                 echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+            - name: Add Helm Repositories
+              run: |
+                helm repo add bitnami https://charts.bitnami.com/bitnami
+                helm repo update
             - name: Create namespace
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
@@ -96,11 +100,9 @@ jobs:
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
                 cd ./s6/d42/charts
-                helm repo update
                 helm upgrade --install redis bitnami/redis --values ./redis/values-redis.yaml -n voting-app
             - name: Deploy to dev postgres
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
                 cd ./s6/d42/charts
-                helm repo update
                 helm upgrade --install postgres bitnami/postgresql --values ./postgres/values-postgres.yaml -n voting-app
