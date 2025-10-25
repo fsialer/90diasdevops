@@ -7,7 +7,7 @@ on:
 jobs:
     docker-build:
         name: Docker Build
-        runs-on: ubuntu-latest
+        runs-on: self-hosted
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v4
@@ -27,7 +27,7 @@ jobs:
                   docker build -t vote-frontend:${{ github.sha }} .
     deploy:
         name: Deploy
-        runs-on: ubuntu-latest
+        runs-on: self-hosted
         needs: docker-build
         steps:
             - name: Checkout Repository
