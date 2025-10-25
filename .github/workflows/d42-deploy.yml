@@ -26,8 +26,9 @@ jobs:
                   docker build -t vote-frontend:${{ github.sha }} .
     
     deploy:
-        name: Docker Build
+        name: Deploy
         runs-on: ubuntu-latest
+        needs: docker-build
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v4
