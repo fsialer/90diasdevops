@@ -72,7 +72,7 @@ jobs:
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
                 cd ./s6/d42/charts
-                helm upgrade --install vote --namespace voting-app \
+                helm upgrade --install vote ./vote --namespace voting-app \
                   --values ./vote/values.yaml \
                   --set image.repository=${{ secrets.DOCKER_USERNAME }}/vote-front:${{ github.sha }} 
                   
@@ -80,7 +80,7 @@ jobs:
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
                 cd ./s6/d42/charts
-                helm upgrade --install worker --namespace voting-app \
+                helm upgrade --install worker ./worker --namespace voting-app \
                   --values ./worker/values.yaml \
                   --set image.repository=${{ secrets.DOCKER_USERNAME }}/worker-backend:${{ github.sha }} 
 
@@ -88,7 +88,7 @@ jobs:
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
                 cd ./s6/d42/charts
-                helm upgrade --install result . --namespace voting-app \
+                helm upgrade --install result ./result --namespace voting-app \
                   --values ./result/values.yaml \
                   --set image.repository=${{ secrets.DOCKER_USERNAME }}/result-frontend:${{ github.sha }}
 
