@@ -22,7 +22,7 @@ jobs:
                   cd ./s6/d42/roxs-devops-project90/roxs-voting-app/vote
                   docker build -t ${{ secrets.DOCKER_USERNAME }}/vote-front:${{ github.sha }} .
                   docker push ${{ secrets.DOCKER_USERNAME }}/vote-front:${{ github.sha }}
-                  
+
             - name: Build worker Image
               run: |
                   cd ./s6/d42/roxs-devops-project90/roxs-voting-app/worker
@@ -81,7 +81,7 @@ jobs:
                 cd ./s6/d42/charts
                 helm upgrade --install vote . --namespace voting-app \
                   --values ./vote/values.yaml
-                  --set image.repository=vote-front:${{ github.sha }} 
+                  --set image.repository=${{ secrets.DOCKER_USERNAME }}/vote-front:${{ github.sha }} 
                   
             - name: Deploy to dev worker
               run: |
@@ -91,7 +91,7 @@ jobs:
                 cd ./s6/d42/charts
                 helm upgrade --install worker . --namespace voting-app \
                   --values ./worker/values.yaml
-                  --set image.repository=worker-backend:${{ github.sha }} 
+                  --set image.repository=${{ secrets.DOCKER_USERNAME }}/worker-backend:${{ github.sha }} 
 
             - name: Deploy to dev result
               run: |
@@ -101,7 +101,7 @@ jobs:
                 cd ./s6/d42/charts
                 helm upgrade --install result . --namespace voting-app \
                   --values ./result/values.yaml
-                  --set image.repository=vote-frontend:${{ github.sha }}
+                  --set image.repository=${{ secrets.DOCKER_USERNAME }}/result-frontend:${{ github.sha }}
 
             - name: Deploy to dev redis
               run: |
