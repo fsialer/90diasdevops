@@ -56,7 +56,7 @@ jobs:
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
                 kubectl get ns --kubeconfig $HOME/.kube/config
                 cd ./s6/d42/voting-app-k8s
-                kubectl create namespace voting-app --dry-run=client -o yaml | kubectl apply -f -
+                # kubectl create namespace voting-app --dry-run=client -o yaml | kubectl apply -f -
                 kubectl apply -f ./01-namespace.yml
 
             - name: Configure storage
@@ -76,7 +76,7 @@ jobs:
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
                 cd ./s6/d42/charts
                 helm upgrade --install vote . --namespace voting-app \
-                  --values ./vote/values.yaml
+                  --values ./vote/values.yaml \
                   --set image.repository=${{ secrets.DOCKER_USERNAME }}/vote-front:${{ github.sha }} 
                   
             - name: Deploy to dev worker
@@ -84,7 +84,7 @@ jobs:
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
                 cd ./s6/d42/charts
                 helm upgrade --install worker . --namespace voting-app \
-                  --values ./worker/values.yaml
+                  --values ./worker/values.yaml \
                   --set image.repository=${{ secrets.DOCKER_USERNAME }}/worker-backend:${{ github.sha }} 
 
             - name: Deploy to dev result
@@ -92,7 +92,7 @@ jobs:
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
                 cd ./s6/d42/charts
                 helm upgrade --install result . --namespace voting-app \
-                  --values ./result/values.yaml
+                  --values ./result/values.yaml \
                   --set image.repository=${{ secrets.DOCKER_USERNAME }}/result-frontend:${{ github.sha }}
 
             - name: Deploy to dev redis
