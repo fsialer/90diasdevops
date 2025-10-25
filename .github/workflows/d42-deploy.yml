@@ -57,19 +57,19 @@ jobs:
                 # kubectl get ns --kubeconfig $HOME/.kube/config
                 cd ./s6/d42/voting-app-k8s
                 # kubectl create namespace voting-app --dry-run=client -o yaml | kubectl apply -f -
-                kubectl apply -f ./01-namespace.yml
+                kubectl apply -f ./01-namespace.yml --validate=false
 
             - name: Configure storage
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
                 cd ./s6/d42/voting-app-k8s
-                kubectl apply -f ./02-storage.yml
+                kubectl apply -f ./02-storage.yml --validate=false
 
             - name: Configure config&secrets
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
                 cd ./s6/d42/voting-app-k8s
-                kubectl apply -f ./03-configs-secrets.yml
+                kubectl apply -f ./03-configs-secrets.yml --validate=false
 
             - name: Deploy to dev vote
               run: |
