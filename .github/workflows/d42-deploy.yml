@@ -45,14 +45,11 @@ jobs:
             - name: Install kubectl & helm
               run: |
                 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-                chmod +x kubectl
-                sudo mv kubectl /usr/local/bin/
+                chmod +x kubectl && sudo mv kubectl /usr/local/bin/
                 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-                kubectl get ns --kubeconfig $HOME/.kube/config
             - name: Create namespace
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                rm -rf $HOME/.kube
                 mkdir -p $HOME/.kube
                 echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
                 kubectl get ns --kubeconfig $HOME/.kube/config
@@ -63,7 +60,6 @@ jobs:
             - name: Configure storage
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                rm -rf $HOME/.kube
                 mkdir -p $HOME/.kube
                 echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
                 cd ./s6/d42/voting-app-k8s
@@ -72,7 +68,6 @@ jobs:
             - name: Configure config&secrets
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                rm -rf $HOME/.kube
                 mkdir -p $HOME/.kube
                 echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
                 cd ./s6/d42/voting-app-k8s
@@ -81,7 +76,6 @@ jobs:
             - name: Deploy to dev vote
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                rm -rf $HOME/.kube
                 mkdir -p $HOME/.kube
                 echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
                 cd ./s6/d42/charts
@@ -92,7 +86,6 @@ jobs:
             - name: Deploy to dev worker
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                rm -rf $HOME/.kube
                 mkdir -p $HOME/.kube
                 echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
                 cd ./s6/d42/charts
@@ -103,7 +96,6 @@ jobs:
             - name: Deploy to dev result
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                rm -rf $HOME/.kube
                 mkdir -p $HOME/.kube
                 echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
                 cd ./s6/d42/charts
@@ -114,7 +106,6 @@ jobs:
             - name: Deploy to dev redis
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                rm -rf $HOME/.kube
                 mkdir -p $HOME/.kube
                 echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
                 cd ./s6/d42/charts
@@ -123,7 +114,6 @@ jobs:
             - name: Deploy to dev postgres
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                rm -rf $HOME/.kube
                 mkdir -p $HOME/.kube
                 echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
                 cd ./s6/d42/charts
