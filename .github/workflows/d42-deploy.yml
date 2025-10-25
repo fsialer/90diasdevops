@@ -47,11 +47,13 @@ jobs:
                 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
                 chmod +x kubectl && sudo mv kubectl /usr/local/bin/
                 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+                rm -rf $HOME/.kube
+                mkdir -p $HOME/.kube
+                echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+                kubectl get ns --kubeconfig $HOME/.kube/config
             - name: Create namespace
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                mkdir -p $HOME/.kube
-                echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
                 kubectl get ns --kubeconfig $HOME/.kube/config
                 cd ./s6/d42/voting-app-k8s
                 kubectl create namespace voting-app --dry-run=client -o yaml | kubectl apply -f -
@@ -60,24 +62,18 @@ jobs:
             - name: Configure storage
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                mkdir -p $HOME/.kube
-                echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
                 cd ./s6/d42/voting-app-k8s
                 kubectl apply -f ./02-storage.yml
 
             - name: Configure config&secrets
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                mkdir -p $HOME/.kube
-                echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
                 cd ./s6/d42/voting-app-k8s
                 kubectl apply -f ./03-configs-secrets.yml
 
             - name: Deploy to dev vote
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                mkdir -p $HOME/.kube
-                echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
                 cd ./s6/d42/charts
                 helm upgrade --install vote . --namespace voting-app \
                   --values ./vote/values.yaml
@@ -86,8 +82,6 @@ jobs:
             - name: Deploy to dev worker
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                mkdir -p $HOME/.kube
-                echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
                 cd ./s6/d42/charts
                 helm upgrade --install worker . --namespace voting-app \
                   --values ./worker/values.yaml
@@ -96,8 +90,6 @@ jobs:
             - name: Deploy to dev result
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                mkdir -p $HOME/.kube
-                echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
                 cd ./s6/d42/charts
                 helm upgrade --install result . --namespace voting-app \
                   --values ./result/values.yaml
@@ -106,16 +98,12 @@ jobs:
             - name: Deploy to dev redis
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                mkdir -p $HOME/.kube
-                echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
                 cd ./s6/d42/charts
                 helm repo update
                 helm upgrade --install redis bitnami/redis --values ./redis/values-redis.yaml -n voting-app
             - name: Deploy to dev postgres
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
-                mkdir -p $HOME/.kube
-                echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
                 cd ./s6/d42/charts
                 helm repo update
                 helm upgrade --install postgres bitnami/postgresql --values ./postgres/values-postgres.yaml -n voting-app
