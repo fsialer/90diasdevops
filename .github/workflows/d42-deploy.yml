@@ -50,7 +50,7 @@ jobs:
                 rm -rf $HOME/.kube
                 mkdir -p $HOME/.kube
                 echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
-                kubectl get ns --kubeconfig $HOME/.kube/config
+                cat $HOME/.kube/config
             - name: Create namespace
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
