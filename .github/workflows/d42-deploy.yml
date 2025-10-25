@@ -14,16 +14,16 @@ jobs:
 
             - name: Build vote Image
               run: |
-                  cd s6/d42/rox-devops-project90/roxs-voting-app/vote
+                  cd ./s6/d42/rox-devops-project90/roxs-voting-app/vote
                   docker build -t vote-front:${{ github.sha }} .
             - name: Build worker Image
               run: |
-                  cd s6/d42/rox-devops-project90/roxs-voting-app/worker
+                  cd ./s6/d42/rox-devops-project90/roxs-voting-app/worker
                   docker build -t worker-backend:${{ github.sha }} .
 
             - name: Build result Image
               run: |
-                  cd s6/d42/rox-devops-project90/roxs-voting-app/result
+                  cd ./s6/d42/rox-devops-project90/roxs-voting-app/result
                   docker build -t vote-frontend:${{ github.sha }} .
     deploy:
         name: Deploy
@@ -43,14 +43,14 @@ jobs:
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
                 mkdir -p $HOME/.kube
                 echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
-                cd s6/d42/voting-app-k8s
+                cd ./s6/d42/voting-app-k8s
                 kubectl apply -f ./01-namespace.yml
             - name: Configure namespace & storage & config & secrets
               run: |
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
                 mkdir -p $HOME/.kube
                 echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
-                cd s6/d42/voting-app-k8s
+                cd ./s6/d42/voting-app-k8s
                 kubectl apply -f ./02-storage.yml
                 kbectl apply -f ./03-configs-secrets.yml
             - name: Deploy to dev customer
@@ -58,7 +58,7 @@ jobs:
                 # Setup kubeconfig (requiere KUBE_CONFIG secret)
                 mkdir -p $HOME/.kube
                 echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
-                cd s6/d42/charts
+                cd ./s6/d42/charts
                 helm upgrade --install vote . --namespace voting-app \
                   --values ./vote/values.yaml
                   --set vote.image=vote-front:${{ github.sha }} 
