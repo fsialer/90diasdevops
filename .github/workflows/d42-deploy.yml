@@ -25,7 +25,6 @@ jobs:
               run: |
                   cd rox-devops-project90/roxs-voting-app/result
                   docker build -t vote-frontend:${{ github.sha }} .
-    
     deploy:
         name: Deploy
         runs-on: ubuntu-latest
@@ -76,3 +75,4 @@ jobs:
                 helm repo update
                 helm upgrade --install redis bitnami/redis --values ./redis/values-redis.yaml -n voting-app
                 helm upgrade --install postgres bitnami/postgresql --values ./postgres/values-postgres.yaml -n voting-app
+                echo "Deployment completed successfully."
