@@ -3,6 +3,7 @@ on:
     push:
         branches: [d42_develop]
         paths: [s6/d42/**]
+    workflow_dispatch:
 jobs:
     docker-build:
         name: Docker Build
