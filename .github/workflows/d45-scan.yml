@@ -1,0 +1,18 @@
+name: Security Scan
+
+on:
+    push:
+        branches: [d45_develop]
+    workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+      - name: Run Trivy
+        run: |
+          trivy image --exit-code 1 --severity CRITICAL,HIGH feralexis007/vote-front:c80c12880336a8fa528c50edb2a7eefcd52f4766
