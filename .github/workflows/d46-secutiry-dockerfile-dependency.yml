@@ -18,7 +18,7 @@ jobs:
       - name: constuir imagen
         run: |
             cd ./s7/d46/fast-api
-            docker build -t fast-api-basic:${{ github.sha }} .
+            docker build -t ${{ secrets.DOCKER_USERNAME }}/fast-api-basic:${{ github.sha }} .
             docker push ${{ secrets.DOCKER_USERNAME }}/fast-api-basic::${{ github.sha }}
       - name: Install Trivy
         run: |
