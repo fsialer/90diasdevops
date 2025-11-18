@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 15s # cada 15 segundos recolecta datos
+
+scrape_configs:
+  # Le dice a prometheus donde encontrar metricas
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
