@@ -1,0 +1,28 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: mi-app-metrics
+  namespace: mi-app
+  labels:
+    app: mi-app
+    release: kube-prometheus # Label importante para que Prometheus lo encuentre
+spec:
+  selector:
+    matchLabels:
+      app: mi-app
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 5s
+    scrapeTimeout: 3s
+    # NUEVO: Configuración para que el job se llame "mi-app-metrics"
+    # Añadimos la siguiente re-etiquetado para sobrescribir el nombre del job.
+    # El ServiceMonitor normalmente usa 'serviceMonitor/...' como nombre de job por defecto.
+    relabelings:
+      # 1. Copia el nombre del ServiceMonitor (ej. mi-app-monitor) a una etiqueta temporal
+      - sourceLabels: [__meta_kubernetes_servicemonitor_name]
+        targetLabel: job
+        replacement: mi-app-metrics # Sobrescribe el valor de 'job' con el que quieres usar
+  # namespaceSelector:
+  #   matchNames:
+  #   - mi-app

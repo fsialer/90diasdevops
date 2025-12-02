@@ -1,0 +1,47 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: mi-app-alerts
+  namespace: mi-app
+  labels:
+    prometheus: kube-prometheus
+    role: alert-rules
+spec:
+  groups:
+  - name: mi-app.rules
+    rules:
+    - alert: AppHighErrorRate
+      expr: rate(app_requests_total{status!="200"}[5m]) / rate(app_requests_total[5m]) > 0.1
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Alta tasa de errores en {{ $labels.namespace }}/{{ $labels.pod }}"
+        description: "La app tiene {{ $value | humanizePercentage }} de errores en los últimos 5 minutos."
+
+    - alert: AppHighLatency
+      expr: histogram_quantile(0.95, rate(app_request_duration_seconds_bucket[5m])) > 1
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Alta latencia en {{ $labels.namespace }}/{{ $labels.pod }}"
+        description: "P95 latency es {{ $value }}s, superior al umbral de 1s."
+
+    - alert: AppDown
+      expr: up{job="mi-app-metrics"} == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "App caída en {{ $labels.namespace }}"
+        description: "El pod {{ $labels.instance }} no está respondiendo a health checks."
+
+    - alert: PodCrashLooping
+      expr: rate(kube_pod_container_status_restarts_total{namespace="mi-app"}[5m]) > 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Pod reiniciándose constantemente"
+        description: "El pod {{ $labels.pod }} se está reiniciando frecuentemente."

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load-tester
+  namespace: mi-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: load-tester
+  template:
+    metadata:
+      labels:
+        app: load-tester
+    spec:
+      containers:
+      - name: load-tester
+        image: curlimages/curl
+        command: ["/bin/sh"]
+        args:
+          - -c
+          - |
+            while true; do
+              echo "🚀 Generando load test..."
+              for i in $(seq 1 20); do
+                curl -s http://mi-app-service.mi-app.svc.cluster.local/ > /dev/null &
+                curl -s http://mi-app-service.mi-app.svc.cluster.local/api/users > /dev/null &
+              done
+              wait
+              echo "💤 Esperando 10s..."
+              sleep 10
+            done
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"

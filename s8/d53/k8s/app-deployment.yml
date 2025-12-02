@@ -1,0 +1,136 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mi-app
+  namespace: mi-app
+  labels:
+    app: mi-app
+spec:
+  replicas: 3  # Múltiples instancias para ver service discovery
+  selector:
+    matchLabels:
+      app: mi-app
+  template:
+    metadata:
+      labels:
+        app: mi-app
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "5000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: app
+        image: python:3.11-slim
+        ports:
+        - containerPort: 5000
+          name: http-metrics
+        command: ["/bin/bash"]
+        args:
+          - -c
+          - |
+            pip install flask prometheus-client requests
+            cat > app.py << 'EOF'
+            from flask import Flask, jsonify, request, Response
+            from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
+            import time
+            import random
+            import threading
+            import os
+
+            app = Flask(__name__)
+
+            # Métricas con labels de pod/namespace
+            requests_total = Counter('app_requests_total', 'Total requests', 
+                                   ['method', 'endpoint', 'status', 'pod', 'namespace'])
+            request_duration = Histogram('app_request_duration_seconds', 'Request duration', 
+                                       ['endpoint', 'pod'])
+            active_users = Gauge('app_active_users', 'Currently active users', ['pod'])
+            errors_total = Counter('app_errors_total', 'Total errors', 
+                                 ['endpoint', 'error_type', 'pod'])
+
+            # Info del pod
+            POD_NAME = os.environ.get('HOSTNAME', 'unknown')
+            NAMESPACE = os.environ.get('NAMESPACE', 'default')
+
+            def simulate_users():
+                while True:
+                    active_users.labels(pod=POD_NAME).set(random.randint(5, 50))
+                    time.sleep(10)
+
+            threading.Thread(target=simulate_users, daemon=True).start()
+
+            @app.route('/metrics')
+            def metrics():
+                data = generate_latest()
+                return Response(data, mimetype=CONTENT_TYPE_LATEST)
+
+            @app.route('/')
+            def home():
+                start_time = time.time()
+                requests_total.labels(method='GET', endpoint='/', status='200', 
+                                     pod=POD_NAME, namespace=NAMESPACE).inc()
+                time.sleep(random.uniform(0.1, 0.5))
+                request_duration.labels(endpoint='/', pod=POD_NAME).observe(time.time() - start_time)
+                
+                return jsonify({
+                    "message": f"¡Hola desde pod {POD_NAME}!",
+                    "pod": POD_NAME,
+                    "namespace": NAMESPACE,
+                    "timestamp": time.time()
+                })
+
+            @app.route('/api/users')
+            def get_users():
+                start_time = time.time()
+                
+                if random.random() < 0.1:
+                    errors_total.labels(endpoint='/api/users', error_type='database_timeout', 
+                                      pod=POD_NAME).inc()
+                    requests_total.labels(method='GET', endpoint='/api/users', status='500',
+                                        pod=POD_NAME, namespace=NAMESPACE).inc()
+                    request_duration.labels(endpoint='/api/users', pod=POD_NAME).observe(time.time() - start_time)
+                    return jsonify({"error": "Database timeout"}), 500
+                
+                time.sleep(random.uniform(0.2, 1.0))
+                requests_total.labels(method='GET', endpoint='/api/users', status='200',
+                                    pod=POD_NAME, namespace=NAMESPACE).inc()
+                request_duration.labels(endpoint='/api/users', pod=POD_NAME).observe(time.time() - start_time)
+                
+                return jsonify({
+                    "users": [{"id": 1, "name": "Juan", "pod": POD_NAME}],
+                    "served_by": POD_NAME
+                })
+
+            @app.route('/health')
+            def health():
+                return jsonify({"status": "UP", "pod": POD_NAME})
+
+            if __name__ == '__main__':
+                app.run(host='0.0.0.0', port=5000)
+            EOF
+            python app.py
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
