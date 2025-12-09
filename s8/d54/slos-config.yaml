@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: slo-definitions
+  namespace: mi-app
+data:
+  slos.yaml: |
+    # SLOs para mi-app
+    services:
+      mi-app:
+        availability:
+          slo: 99.9%  # 43 seconds downtime per month
+          sli: |
+            rate(app_requests_total{status=~"2.."}[30d]) /
+            rate(app_requests_total[30d])
+        
+        latency:
+          slo: 95%  # 95% of requests < 500ms
+          threshold: 0.5  # 500ms
+          sli: |
+            histogram_quantile(0.95, 
+              rate(app_request_duration_seconds_bucket[5m])
+            )
+        
+        error_budget:
+          period: 30d  # Monthly error budget
+          burn_rate_fast: 6    # 6x normal rate = critical
+          burn_rate_slow: 3    # 3x normal rate = warning

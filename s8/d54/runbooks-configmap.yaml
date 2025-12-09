@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: runbooks
+  namespace: mi-app
+data:
+  slo-burn-rate.md: |
+    # SLO Error Budget Burn Rate - Incident Response
+
+    ## Immediate Actions (< 5 minutes)
+    1. **Assess Impact**: Check current error rate and affected users
+       ```bash
+       # Current error rate
+       kubectl exec -n monitoring prometheus-kube-prometheus-prometheus-0 -- \
+         promtool query instant 'rate(app_requests_total{status!~"2.."}[5m])'
+       
+       # Affected pods
+       kubectl get pods -n mi-app --field-selector=status.phase!=Running

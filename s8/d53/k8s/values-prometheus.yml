@@ -12,6 +12,13 @@ prometheus:
         values:
           - monitoring
           - mi-app
+    ruleNamespaceSelector:
+      matchNames:
+        - monitoring
+        - mi-app
+    ruleSelector:
+      matchLabels:
+        prometheus: kube-prometheus
 grafana:
   adminPassword: "admin123"
   service:
@@ -22,3 +29,6 @@ alertmanager:
   service:
     type: NodePort
     nodePort: 30002
+  alertmanagerSpec:
+    configSecret: alertmanager-kube-prometheus-alertmanager
+    configMapKey: alertmanager.yaml

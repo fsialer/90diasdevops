@@ -36,7 +36,7 @@ helm upgrade kube-prometheus prometheus-community/kube-prometheus-stack \
 
 helm upgrade --install kube-prometheus prometheus-community/kube-prometheus-stack \
   --namespace monitoring \
-  -f custom-prometheus.yml
+  -f values-prometheus.yml
 
   helm upgrade --install kube-prometheus prometheus-community/kube-prometheus-stack \
   --namespace monitoring \
@@ -83,7 +83,7 @@ kubectl apply -f app-servicemonitor.yml
 kubectl get servicemonitor -n mi-app
 
 # Deployment de Load Tester
-kubectl apply -f load-tester.yaml
+kubectl apply -f load-tester.yml
 # Ver logs del load tester
 kubectl logs -f deployment/load-tester -n mi-app
 

@@ -1,0 +1,108 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: error-budget-alerts
+  namespace: mi-app
+  labels:
+    prometheus: kube-prometheus
+    #role: recording
+    role: alert-rules
+spec:
+  groups:
+  - name: slo.rules
+    interval: 30s
+    rules:
+    # Calculate availability SLI
+    - record: sli:availability:rate5m
+      expr: |
+        rate(app_requests_total{status=~"2.."}[5m]) /
+        rate(app_requests_total[5m])
+    
+    - record: sli:availability:rate30m
+      expr: |
+        rate(app_requests_total{status=~"2.."}[30m]) /
+        rate(app_requests_total[30m])
+    
+    - record: sli:availability:rate6h
+      expr: |
+        rate(app_requests_total{status=~"2.."}[6h]) /
+        rate(app_requests_total[6h])
+    
+    # Calculate latency SLI
+    - record: sli:latency:p99:rate5m
+      expr: |
+        histogram_quantile(0.99, 
+          rate(app_request_duration_seconds_bucket[5m])
+        )
+    
+    # Error budget burn rate
+    - record: slo:error_budget_burn_rate:5m
+      expr: |
+        (1 - sli:availability:rate5m) / (1 - 0.999)
+    
+    - record: slo:error_budget_burn_rate:30m
+      expr: |
+        (1 - sli:availability:rate30m) / (1 - 0.999)
+
+  - name: slo.alerts
+    rules:
+    # CRITICAL: Fast burn rate (budget exhausted in 2 hours)
+    - alert: SLOErrorBudgetBurnRateCritical
+      expr: |
+        slo:error_budget_burn_rate:5m > 6 and
+        slo:error_budget_burn_rate:30m > 6
+      for: 2m
+      labels:
+        severity: critical
+        team: platform
+        runbook: "https://runbooks.company.com/slo-burn-rate"
+      annotations:
+        summary: "🚨 CRITICAL: Error budget burning too fast"
+        description: |
+          Service {{ $labels.service }} is burning error budget at {{ $value | humanize }}x 
+          the normal rate. At this rate, monthly error budget will be exhausted in 2 hours.
+          
+          Current availability: {{ with query "sli:availability:rate5m" }}{{ . | first | value | humanizePercentage }}{{ end }}
+          SLO: 99.9%
+        
+    # WARNING: Medium burn rate (budget exhausted in 1 day)
+    - alert: SLOErrorBudgetBurnRateHigh
+      expr: |
+        slo:error_budget_burn_rate:5m > 3 and
+        slo:error_budget_burn_rate:6h > 3
+      for: 15m
+      labels:
+        severity: warning
+        team: platform
+      annotations:
+        summary: "⚠️ WARNING: Error budget burning faster than usual"
+        description: |
+          Service {{ $labels.service }} is burning error budget at {{ $value | humanize }}x 
+          the normal rate. At this rate, monthly error budget will be exhausted in 1 day.
+
+    # Latency SLO breach
+    - alert: SLOLatencyBreach
+      expr: sli:latency:p99:rate5m > 0.5
+      for: 2m
+      labels:
+        severity: warning
+        team: platform
+      annotations:
+        summary: "Latency SLO breach detected"
+        description: |
+          P99 latency is {{ $value }}s, exceeding SLO of 500ms.
+          This affects user experience quality.
+
+    # Error budget exhaustion prediction
+    - alert: SLOErrorBudgetExhaustionRisk
+      expr: |
+        predict_linear(slo:error_budget_burn_rate:30m[6h], 7*24*3600) > 1
+      for: 5m
+      labels:
+        severity: warning
+        team: platform
+      annotations:
+        summary: "Error budget at risk of exhaustion"
+        description: |
+          Based on current trends, error budget will be exhausted in less than 7 days.
+          Consider reducing deployment frequency or improving reliability.

@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: oncall-schedule
+  namespace: monitoring
+data:
+  schedule.json: |
+    {
+      "rotation": "weekly",
+      "timezone": "America/Argentina/Buenos_Aires",
+      "schedule": [
+        {
+          "week": 1,
+          "primary": "juan@company.com",
+          "secondary": "maria@company.com"
+        },
+        {
+          "week": 2,
+          "primary": "carlos@company.com", 
+          "secondary": "ana@company.com"
+        }
+      ],
+      "escalation": [
+        {"level": 1, "delay": "5m", "target": "primary"},
+        {"level": 2, "delay": "15m", "target": "secondary"},
+        {"level": 3, "delay": "30m", "target": "manager@company.com"}
+      ]
+    }
