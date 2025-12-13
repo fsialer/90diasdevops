@@ -1,0 +1,34 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: observability-demo
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+    - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+  extraPortMappings:
+  - containerPort: 30090
+    hostPort: 30090
+    protocol: TCP # Prometheus
+  - containerPort: 30091
+    hostPort: 30091
+    protocol: TCP # Grafana
+  - containerPort: 30092
+    hostPort: 30092
+    protocol: TCP # Jaeger
+  - containerPort: 30093
+    hostPort: 30093
+    protocol: TCP # kibana
+  - containerPort: 30094
+    hostPort: 30094
+    protocol: TCP # AlertManager
+- role: worker
+  labels:
+    tier: "monitoring"
+- role: worker
+  labels:
+    tier: "logging"
+

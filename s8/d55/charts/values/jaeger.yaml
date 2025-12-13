@@ -1,0 +1,5 @@
+allInOne:
+    enabled: true
+    service:
+        type: NodePort
+        nodePort: 30092

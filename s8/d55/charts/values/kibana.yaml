@@ -1,0 +1,7 @@
+service:
+    type: NodePort
+    nodePort: 30093
+    
+elasticsearchHosts: "https://elasticsearch-master:9200"
+# elasticsearch:
+#   createElasticsearchUser: false

@@ -60,6 +60,7 @@ echo "AlertManager: http://localhost:30002"
 #Port forwarding alternativo
 kubectl port-forward -n monitoring svc/kube-prometheus-grafana 3000:80 &
 kubectl port-forward -n monitoring svc/prometheus-operated 9090:9090 &
+kubectl port-forward -n monitoring svc/prometheus-operated 30092:5778 &
 
 
 # Desplegar la app
