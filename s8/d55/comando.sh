@@ -10,7 +10,7 @@ helm repo add elastic https://helm.elastic.co
 helm repo update
 
 # Crea Namespaces
-kubectl create namespace monitoring     # Prometheus, Grafana, AlertManager
+kubectl create namespace monitoring    # Prometheus, Grafana, AlertManager
 kubectl create namespace tracing       # Jaeger
 kubectl create namespace logging       # ELK Stack
 
@@ -41,6 +41,6 @@ helm install kibana elastic/kibana \
 
 kubectl port-forward svc/jaeger-query 30092:16686 -n tracing &
 kubectl port-forward svc/elasticsearch-master 9200:9200 -n logging &
-kubectl port-forward svc/kibana-kibana 30093:30093 -n logging &
+kubectl port-forward svc/kibana-kibana 30093:5601 -n logging &
 kubectl get secret elasticsearch-master-credentials -n logging -o jsonpath='{.data.username}' | base64 --decode; echo # ver usuario
 kubectl get secret elasticsearch-master-credentials -n logging -o jsonpath='{.data.password}' | base64 --decode; echo # ver la contraseña

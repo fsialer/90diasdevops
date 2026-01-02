@@ -1,0 +1,48 @@
+{
+  "dashboard": {
+    "title": "🔧 Voting App - Technical Dashboard",
+    "tags": ["voting", "technical", "sre"],
+    "panels": [
+      {
+        "title": "Request Rate (RPS)",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "sum(rate(vote_http_requests_total[1m])) by (service)",
+            "legendFormat": "{{service}}"
+          }
+        ]
+      },
+      {
+        "title": "Response Time P95",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(vote_http_duration_seconds_bucket[5m]))",
+            "legendFormat": "P95 Response Time"
+          }
+        ]
+      },
+      {
+        "title": "Error Rate",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(vote_http_requests_total{status=~'5..'}[1m]) / rate(vote_http_requests_total[1m]) * 100",
+            "legendFormat": "Error Rate %"
+          }
+        ]
+      },
+      {
+        "title": "Queue Length",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "redis_list_length{list='votes'}",
+            "legendFormat": "Vote Queue Length"
+          }
+        ]
+      }
+    ]
+  }
+}

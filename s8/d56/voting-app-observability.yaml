@@ -1,0 +1,171 @@
+# Namespace para la app
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: voting-app
+  labels:
+    monitoring: enabled
+
+---
+# Vote Service (Frontend)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vote
+  namespace: voting-app
+  labels:
+    app: vote
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vote
+  template:
+    metadata:
+      labels:
+        app: vote
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "80"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: vote
+        image: feralexis007/vote-front:c80c12880336a8fa528c50edb2a7eefcd52f4766  # 🔄 Imagen ya instrumentada
+        ports:
+        - containerPort: 80
+          name: http
+        env:
+        - name: REDIS_URL
+          value: "redis://redis-master.databases.svc.cluster.local:6379"
+        - name: JAEGER_AGENT_HOST
+          value: "jaeger-agent.tracing.svc.cluster.local"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vote
+  namespace: voting-app
+  labels:
+    app: vote
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30080
+    name: http
+  selector:
+    app: vote
+
+---
+# Worker Service (Processor)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: voting-app
+  labels:
+    app: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: worker
+        image: feralexis007/worker-backend:c80c12880336a8fa528c50edb2a7eefcd52f4766 # 🔄 Imagen ya instrumentada
+        ports:
+        - containerPort: 8080
+          name: metrics
+        env:
+        - name: REDIS_URL
+          value: "redis://redis-master.databases.svc.cluster.local:6379"
+        - name: POSTGRES_URL
+          value: "postgresql://voting:voting123@postgresql.databases.svc.cluster.local:5432/voting"
+        - name: JAEGER_AGENT_HOST
+          value: "jaeger-agent.tracing.svc.cluster.local"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "300m"
+            memory: "256Mi"
+
+---
+# Result Service (Backend)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: result
+  namespace: voting-app
+  labels:
+    app: result
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: result
+  template:
+    metadata:
+      labels:
+        app: result
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "80"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: result
+        image: result:instrumented # 🔄 Imagen ya instrumentada
+        ports:
+        - containerPort: 80
+          name: http
+        env:
+        - name: POSTGRES_URL
+          value: "postgresql://voting:voting123@postgresql.databases.svc.cluster.local:5432/voting"
+        - name: JAEGER_AGENT_HOST
+          value: "jaeger-agent.tracing.svc.cluster.local"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: result
+  namespace: voting-app
+  labels:
+    app: result
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30081
+    name: http
+  selector:
+    app: result

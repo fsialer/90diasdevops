@@ -1,0 +1,79 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: voting-app-alerts
+  namespace: voting-app
+  labels:
+    prometheus: kube-prometheus
+    role: alert-rules
+spec:
+  groups:
+  - name: voting-app.slo
+    interval: 30s
+    rules:
+    # SLI: Availability (success rate)
+    - record: sli:voting:availability:rate5m
+      expr: |
+        rate(vote_http_requests_total{status=~"2.."}[5m]) /
+        rate(vote_http_requests_total[5m])
+    
+    # SLI: Latency (P95 response time)
+    - record: sli:voting:latency:p95:rate5m
+      expr: |
+        histogram_quantile(0.95, 
+          rate(vote_http_duration_seconds_bucket[5m])
+        )
+    
+    # Error Budget Burn Rate (SLO: 99.5% availability)
+    - record: slo:voting:error_budget_burn_rate
+      expr: |
+        (1 - sli:voting:availability:rate5m) / (1 - 0.995)
+    
+  - name: voting-app.alerts
+    rules:
+    # CRITICAL: High error budget burn rate
+    - alert: VotingAppErrorBudgetBurnRateCritical
+      expr: slo:voting:error_budget_burn_rate > 10
+      for: 2m
+      labels:
+        severity: critical
+        team: platform
+      annotations:
+        summary: "🚨 Voting App: Critical error budget burn rate"
+        description: |
+          Error budget burning at {{ $value | humanize }}x normal rate.
+          Current availability: {{ with query "sli:voting:availability:rate5m" }}{{ . | first | value | humanizePercentage }}{{ end }}
+          SLO: 99.5%
+
+    # WARNING: High latency
+    - alert: VotingAppHighLatency
+      expr: sli:voting:latency:p95:rate5m > 1
+      for: 5m
+      labels:
+        severity: warning
+        team: platform
+      annotations:
+        summary: "⚠️ Voting App: High response time"
+        description: "P95 latency is {{ $value }}s, exceeding 1s threshold"
+
+    # WARNING: Queue backup
+    - alert: VotingAppQueueBackup
+      expr: redis_list_length{list="votes"} > 100
+      for: 2m
+      labels:
+        severity: warning
+        team: platform
+      annotations:
+        summary: "📬 Voting App: Vote queue backing up"
+        description: "{{ $value }} votes pending processing"
+
+    # INFO: High voting activity
+    - alert: VotingAppHighActivity
+      expr: rate(vote_votes_total[1m]) * 60 > 50
+      for: 1m
+      labels:
+        severity: info
+        team: business
+      annotations:
+        summary: "📈 Voting App: High voting activity detected"
+        description: "{{ $value }} votes per minute - consider scaling"

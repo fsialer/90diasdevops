@@ -1,0 +1,48 @@
+{
+  "dashboard": {
+    "title": "🗳️ Voting App - Business Dashboard",
+    "tags": ["voting", "business"],
+    "panels": [
+      {
+        "title": "Total Votes Today",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(vote_votes_total[24h]))",
+            "legendFormat": "Total Votes"
+          }
+        ]
+      },
+      {
+        "title": "Votes per Option",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (option) (increase(vote_votes_total[1h]))",
+            "legendFormat": "{{option}}"
+          }
+        ]
+      },
+      {
+        "title": "Voting Rate (votes/min)",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(vote_votes_total[1m]) * 60",
+            "legendFormat": "Votes per minute"
+          }
+        ]
+      },
+      {
+        "title": "Active Voters",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "vote_active_voters",
+            "legendFormat": "Active Users"
+          }
+        ]
+      }
+    ]
+  }
+}

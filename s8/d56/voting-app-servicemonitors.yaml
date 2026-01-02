@@ -1,0 +1,68 @@
+# ServiceMonitor para Vote Service
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: vote-metrics
+  namespace: voting-app
+  labels:
+    app: vote
+    release: prometheus-stack #  🔄 Label importante para discovery
+spec:
+  selector:
+    matchLabels:
+      app: vote
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 15s
+    scrapeTimeout: 10s
+  namespaceSelector:
+    matchNames:
+    - voting-app
+
+---
+# ServiceMonitor para owrker
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: worker-metrics
+  namespace: voting-app
+  labels:
+    app: worker
+    release: prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: worker
+  endpoints:
+  - port: metrics
+    path: /metrics
+    interval: 15s
+    scrapeTimeout: 10s
+  namespaceSelector:
+    matchNames:
+    - voting-app
+
+---
+# ServiceMonitor para Result service
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: result-metrics
+  namespace: voting-app
+  labels:
+    app: result
+    release: prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      appp: result
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 15s
+    scrapeTimeout: 10s
+  namespaceSelector:
+    matchNames:
+    - voting-app
