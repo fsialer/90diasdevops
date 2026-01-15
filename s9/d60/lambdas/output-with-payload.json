@@ -1,0 +1,1 @@
+{"statusCode": 200, "headers": {"Content-Type": "application/json"}, "body": "{\"message\": \"\\u00a1Hola DevOps Roxs!\", \"input_message\": \"Ejecutando desde LocalStack!\", \"timestamp\": \"2026-01-09T21:20:50.174516\", \"function_name\": \"roxs-basic-function\", \"processed_by\": \"LocalStack Lambda\"}"}

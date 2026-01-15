@@ -1,0 +1,4 @@
+{
+    "statusCode": 200,
+    "body": "{\"mensaje\": \"\\u00a1Hola FERNANDO! Bienvenido a Lambda local\", \"evento_recibido\": {\"nombre\": \"FERNANDO\"}}"
+}

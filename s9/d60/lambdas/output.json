@@ -1,0 +1,1 @@
+{"statusCode": 200, "headers": {"Content-Type": "application/json"}, "body": "{\"message\": \"\\u00a1Hola Roxs Developer!\", \"input_message\": \"Hello from localstack lambda\", \"timestamp\": \"2026-01-09T21:14:05.122429\", \"function_name\": \"roxs-basic-function\", \"processed_by\": \"LocalStack Lambda\"}"}

@@ -1,0 +1,4 @@
+{
+    "statusCode": 200,
+    "body": "{\"message\": \"Archivo procesado exitosamente\", \"report_location\": \"roxs-reports/reports/archivo.txt-report.json\", \"stats\": {\"total_lines\": 3, \"total_words\": 10, \"total_characters\": 45}}"
+}

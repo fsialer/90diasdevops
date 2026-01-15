@@ -1,0 +1,1 @@
+{"statusCode": 200, "body": "{\"message\": \"Archivo demo-file.txt procesado exitosamente\", \"file_size\": 35, \"process_info_saved_to\": \"processed/demo-file.txt.json\"}"}
