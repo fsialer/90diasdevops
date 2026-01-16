@@ -1,0 +1,1 @@
+{"statusCode": 200, "body": "{\"message\": \"Notificaci\\u00f3n procesada exitosamente\", \"notification_id\": \"cc58b0b5-964b-4e09-8200-b3fedb68baa4\", \"sns_message_id\": \"da6bf9de-b084-4a23-a3be-025e2ff439f9\", \"recipient\": \"team@roxs.com\", \"type\": \"info\"}"}

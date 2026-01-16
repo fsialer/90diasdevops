@@ -1,0 +1,1 @@
+{"statusCode": 200, "body": "{\"message\": \"Procesados 3 logs exitosamente\", \"batch_id\": \"ed6d874d-8411-4a16-a152-b9613fa3bc6a\", \"storage_location\": \"s3://roxs-logs-storage/logs/2026/01/16/16/ed6d874d-8411-4a16-a152-b9613fa3bc6a.json.gz\", \"logs_indexed\": 3}"}
