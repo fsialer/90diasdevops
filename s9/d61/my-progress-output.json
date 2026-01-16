@@ -1,0 +1,4 @@
+{
+    "statusCode": 200,
+    "body": "{\"student_id\": \"fernando\", \"name\": \"Fernando Sialer\", \"total_days_logged\": 3, \"completed_days\": 3, \"completion_rate\": \"100.0%\", \"average_difficulty\": \"3.7/5\", \"current_day\": \"61\"}"
+}

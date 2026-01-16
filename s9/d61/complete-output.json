@@ -1,0 +1,1 @@
+{"statusCode": 200, "body": "{\"message\": \"Archivo procesado exitosamente\", \"file_id\": \"ce7da235-1676-41c8-9533-6128fb7d84a4\", \"report_location\": \"roxs-bucket/reports/test-complete.txt-analysis.json\", \"analysis\": {\"lines\": 5, \"words\": 21, \"characters\": 118, \"size_bytes\": 120}}"}

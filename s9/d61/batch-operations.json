@@ -1,0 +1,24 @@
+{
+    "RoxsUsers": [
+        {
+            "PutRequest": {
+                "Item": {
+                    "UserId": {"S": "batch001"},
+                    "Name": {"S": "Usuario Batch 1"},
+                    "Email": {"S": "batch1@roxs.com"},
+                    "Age": {"N": "30"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "UserId": {"S": "batch002"},
+                    "Name": {"S": "Usuario Batch 2"},
+                    "Email": {"S": "batch2@roxs.com"},
+                    "Age": {"N": "25"}
+                }
+            }
+        }
+    ]
+}

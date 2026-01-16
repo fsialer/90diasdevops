@@ -1,0 +1,11 @@
+{
+  "file_id": "ce7da235-1676-41c8-9533-6128fb7d84a4",
+  "original_file": "roxs-bucket/test-complete.txt",
+  "analysis": {
+    "lines": 5,
+    "words": 21,
+    "characters": 118,
+    "size_bytes": 120
+  },
+  "processed_at": "2026-01-15T19:33:12.503070"
+}

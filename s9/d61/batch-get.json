@@ -1,0 +1,10 @@
+{
+    "RoxsUsers": {
+        "Keys": [
+            {"UserId": {"S": "user001"}},
+            {"UserId": {"S": "batch001"}},
+            {"UserId": {"S": "batch002"}}
+        ],
+        "ProjectionExpression": "UserId,Name,Email"
+    }
+}

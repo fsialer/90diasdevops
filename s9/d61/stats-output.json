@@ -1,0 +1,4 @@
+{
+    "statusCode": 200,
+    "body": "{\"total_files_processed\": 1, \"total_size_bytes\": 120, \"file_types\": {\"txt\": 1}, \"files\": [{\"file_id\": \"ce7da235-1676-41c8-9533-6128fb7d84a4\", \"path\": \"roxs-bucket/test-complete.txt\", \"size\": 120, \"processed_at\": \"2026-01-15T19:33:12.410419\"}]}"
+}
