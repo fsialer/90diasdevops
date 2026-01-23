@@ -6,3 +6,5 @@ app/
 **/env
 **/*.zip
 **/*.txt
+**/*.hcl
+**/.terraform
