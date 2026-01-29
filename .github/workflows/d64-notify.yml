@@ -1,0 +1,46 @@
+name: 📢 Smart Notifications
+
+on:
+  workflow_run:
+    workflows: ["CI/CD Pipeline"]
+    types: [completed]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' && github.ref == 'refs/heads/main' }}
+    steps:
+    - name: 🚨 Send failure alert
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        channel: '#alerts-prod'
+        fields: repo,commit,author,took
+        text: |
+          🚨 *Production Pipeline Failed*
+          
+          Repository: ${{ github.repository }}
+          Branch: ${{ github.ref_name }}
+          Commit: ${{ github.event.workflow_run.head_commit.message }}
+          Author: ${{ github.event.workflow_run.head_commit.author.name }}
+          
+          <${{ github.event.workflow_run.html_url }}|View Details>
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+  notify-success:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/main' }}
+    steps:
+    - name: ✅ Send success summary (weekly)
+      if: ${{ github.event.schedule == '0 9 * * 1' }}  # Solo lunes
+      uses: 8398a7/action-slack@v3
+      with:
+        status: success
+        channel: '#deployments'
+        text: |
+          📊 *Weekly Deployment Summary*
+          
+          This week's production deployments: ✅ Successful
+          Average pipeline time: ${{ env.AVG_TIME }}
+          Success rate: ${{ env.SUCCESS_RATE }}%

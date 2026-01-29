@@ -4,6 +4,7 @@ app/
 *.pem
 *.env
 **/env
+**/venv
 **/*.zip
 **/*.txt
 **/*.hcl

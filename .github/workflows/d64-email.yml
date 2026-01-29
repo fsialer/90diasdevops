@@ -1,0 +1,21 @@
+critical-alert:
+  if: failure() && contains(github.event.head_commit.message, '[critical]')
+  runs-on: ubuntu-latest
+  steps:
+  - name: 📧 Send critical email
+    uses: dawidd6/action-send-mail@v3
+    with:
+      server_address: smtp.gmail.com
+      server_port: 587
+      username: ${{ secrets.MAIL_USERNAME }}
+      password: ${{ secrets.MAIL_PASSWORD }}
+      subject: 🚨 CRITICAL: Production Pipeline Failure
+      body: |
+        Critical pipeline failure detected.
+        
+        Repository: ${{ github.repository }}
+        Commit: ${{ github.sha }}
+        Branch: ${{ github.ref }}
+        
+        Immediate attention required.
+      to: devops-oncall@company.com
