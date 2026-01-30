@@ -1,0 +1,17 @@
+🔥 STRESS TEST BÁSICO
+===================
+📋 1. Verificación inicial...
+✅ App responde correctamente
+
+🚀 2. Test de requests paralelos (50 requests simultáneos)...
+✅ 50 requests completados en 5s
+
+⏰ 3. Carga sostenida por 60 segundos...
+   (5 requests por segundo durante 1 minuto)
+✅ Completados 185 requests en 60 segundos
+
+💻 4. Test de endpoint CPU-intensive...
+✅ 10 requests CPU-intensive completados en 1s
+
+🎉 Stress test básico completado!
+💡 Próximo paso: monitoring avanzado

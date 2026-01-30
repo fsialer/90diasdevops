@@ -1,0 +1,10 @@
+{
+  "test_duration": 80,
+  "avg_cpu": 5.7775,
+  "max_cpu": 29.1,
+  "avg_memory": 79.7875,
+  "max_memory": 80.9,
+  "avg_response_time": 17.7318274974823,
+  "max_response_time": 29.064178466796875,
+  "app_availability": 100.0
+}

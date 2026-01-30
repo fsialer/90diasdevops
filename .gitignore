@@ -9,3 +9,5 @@ app/
 **/*.txt
 **/*.hcl
 **/.terraform
+**/node_modules
+**/env

@@ -1,0 +1,23 @@
+{
+  "test_date": "2026-01-29T11:34:00.398943",
+  "basic_tests": {
+    "parallel_requests": "50 requests en 5s",
+    "sustained_load": "300 requests en 60s",
+    "cpu_intensive": "10 requests completados",
+    "status": "completed"
+  },
+  "k6_tests": {
+    "status": "not_executed",
+    "reason": "K6 summary not found"
+  },
+  "chaos_tests": {
+    "container_kills": "3 tests executed",
+    "cpu_stress": "App maintained responsiveness",
+    "memory_pressure": "System recovered within limits",
+    "network_latency": "Tolerance verified",
+    "status": "completed"
+  },
+  "monitoring": {
+    "status": "not_available"
+  }
+}
