@@ -1,0 +1,17 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+  
+  - job_name: 'mi-aplicacion'
+    static_configs:
+      - targets: ['host.docker.internal:8080']  # Si tienes app en puerto 8080
+    scrape_interval: 30s
+    metrics_path: '/metrics'

@@ -1,0 +1,19 @@
+groups:
+- name: predictive-alerts
+  rules:
+  - alert: HighMemoryPredicted
+    expr: predict_linear(node_memory_usage[1h], 4*3600) > 0.9
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Memory usage will be high in 4 hours"
+      description: "Memory on {{ $labels.instance }} predicted to reach 90% in 4h"
+
+  - alert: DiskSpaceRunningOut
+    expr: predict_linear(node_filesystem_free_bytes[6h], 24*3600) < 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Disk space will run out in 24 hours"

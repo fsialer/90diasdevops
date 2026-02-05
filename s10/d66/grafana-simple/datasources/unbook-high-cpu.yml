@@ -1,0 +1,15 @@
+# runbook-high-cpu.yml
+name: "High CPU Usage Response"
+trigger: "CPUUsage > 80%"
+actions:
+  - type: "scale_up"
+    params:
+      instances: 2
+  - type: "notify"
+    params:
+      channel: "#alerts"
+      message: "Auto-scaling triggered due to high CPU"
+  - type: "investigation"
+    params:
+      collect_logs: true
+      duration: "10m"

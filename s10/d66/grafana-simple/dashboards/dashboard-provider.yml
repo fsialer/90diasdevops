@@ -1,0 +1,8 @@
+# dashboards/dashboard-provider.yml
+apiVersion: 1
+providers:
+  - name: 'default'
+    type: file
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/provisioning/dashboards

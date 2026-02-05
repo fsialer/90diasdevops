@@ -1,0 +1,21 @@
+{
+  "dashboard": {
+    "title": "SLA Dashboard",
+    "panels": [
+      {
+        "title": "Uptime SLA",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg_over_time(up[30d]) * 100"
+          }
+        ],
+        "thresholds": [
+          {"color": "red", "value": 99.0},
+          {"color": "yellow", "value": 99.5},
+          {"color": "green", "value": 99.9}
+        ]
+      }
+    ]
+  }
+}
