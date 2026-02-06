@@ -1,0 +1,24 @@
+{
+  "name": "node-otel-jaeger",
+  "description": "Node.js con OpenTelemetry y Jaeger",
+  "version": "1.0.0",
+  "services": [
+    "grafana",
+    "node-exporter",
+    "prometheus"
+  ],
+  "ports": [
+    "3000",
+    "9090",
+    "9100"
+  ],
+  "dependencies": {
+    "node": [
+      "@opentelemetry/api",
+      "@opentelemetry/sdk-node",
+      "@opentelemetry/auto-instrumentations-node",
+      "@opentelemetry/exporter-jaeger"
+    ],
+    "python": []
+  }
+}

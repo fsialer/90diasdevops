@@ -1,0 +1,16 @@
+{
+  "name": "node-otel-jaeger",
+  "version": "1.0.0",
+  "description": "Node.js con OpenTelemetry y Jaeger",
+  "main": "app.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^1.8.0",
+    "@opentelemetry/sdk-node": "^0.50.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.50.0",
+    "@opentelemetry/exporter-jaeger": "^1.23.0"
+  }
+}
